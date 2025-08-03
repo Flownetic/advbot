@@ -1,130 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bi-Alphabetical Chatbot - Flovvnetic.io</title>
-    <style>
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #121212;
-            color: #e0e0e0;
-            line-height: 1.6;
-        }
-        
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            background-color: #000000;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 2px solid #00ff88;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00ff88;
-            text-decoration: none;
-        }
-        
-        /* Chatbot Container */
-        .chatbot-container {
-            max-width: 800px;
-            margin: 3rem auto;
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
-            border: 1px solid #333333;
-        }
-        
-        .chatbot-header {
-            background-color: #000000;
-            padding: 1.5rem;
-            border-bottom: 2px solid #00ff88;
-            text-align: center;
-        }
-        
-        .chatbot-header h2 {
-            color: #00ff88;
-            margin-bottom: 0.5rem;
-        }
-        
-        .chatbot-header p {
-            color: #b0b0b0;
-        }
-        
-        #chat-container {
-            height: 500px;
-            padding: 1.5rem;
-            background-color: #121212;
-            overflow-y: auto;
-        }
-        
-        .message {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            max-width: 80%;
-            line-height: 1.5;
-            position: relative;
-            clear: both;
-        }
-        
-        .user-message {
-            background-color: #003d1f;
-            margin-left: auto;
-            border-bottom-right-radius: 0;
-            border: 1px solid #00a55a;
-        }
-        
-        .bot-message {
-            background-color: #1a1a1a;
-            margin-right: auto;
-            border-bottom-left-radius: 0;
-            border: 1px solid #333333;
-        }
-        
-        .result-box {
-            margin: 15px 0;
-            padding: 15px;
-            background-color: #252525;
-            border-radius: 8px;
-            border-left: 3px solid #00ff88;
-        }
-        
-        .result-title {
-            font-weight: bold;
-            color: #00ff88;
-            margin-bottom: 8px;
-        }
-        
-        .search-path {
-            font-size: 0.8em;
-            color: #888;
-            margin-top: 5px;
-        }
-        
-        .loading {
-            color: #888;
-            font-style: italic;
-        }
-        
-        .chat-input-container {
-            display: flex;
-            padding: 1rem;
+        padding: 1rem;
             background-color: #000000;
             border-top: 1px solid #333333;
         }
@@ -396,6 +270,423 @@
         addMessage('bot', "Enter a word and I'll search based on its first two letters.");
         addMessage('bot', "Example: 'apple' → searches data/a/p.json");
         addMessage('bot', "Note: I ignore pronouns, question words, and helping verbs.");
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bi-Alphabetical Chatbot - Flovvnetic.io</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+            font-size: 16px; /* Normal base font size */
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: #000000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        .logo {
+            font-size: 1.2rem; /* Reduced from 1.8rem */
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        /* Chatbot Container */
+        .chatbot-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+            border: 1px solid #333333;
+        }
+        
+        .chatbot-header {
+            background-color: #000000;
+            padding: 1rem;
+            border-bottom: 2px solid #00ff88;
+            text-align: center;
+        }
+        
+        .chatbot-header h2 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem; /* Normal heading size */
+        }
+        
+        .chatbot-header p {
+            color: #b0b0b0;
+            font-size: 0.9rem; /* Slightly smaller for secondary text */
+            margin-bottom: 0.5rem;
+        }
+        
+        #chat-container {
+            height: 500px;
+            padding: 1rem;
+            background-color: #121212;
+            overflow-y: auto;
+            font-size: 0.95rem; /* Normal chat text size */
+        }
+        
+        .message {
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.4;
+            position: relative;
+            clear: both;
+            font-size: 0.95rem; /* Consistent message text size */
+        }
+        
+        .user-message {
+            background-color: #003d1f;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+            border: 1px solid #00a55a;
+        }
+        
+        .bot-message {
+            background-color: #1a1a1a;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            border: 1px solid #333333;
+        }
+        
+        .result-box {
+            margin: 0.8rem 0;
+            padding: 0.8rem;
+            background-color: #252525;
+            border-radius: 8px;
+            border-left: 3px solid #00ff88;
+            font-size: 0.9rem; /* Slightly smaller for results */
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+        
+        .search-path {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.3rem;
+        }
+        
+        .loading {
+            color: #888;
+            font-style: italic;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 0.8rem;
+            background-color: #000000;
+            border-top: 1px solid #333333;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            background-color: #1e1e1e;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 0.95rem; /* Normal input text size */
+        }
+        
+        #user-input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+        
+        #send-btn {
+            margin-left: 0.5rem;
+            padding: 0.6rem 1rem;
+            background-color: #00ff88;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem; /* Normal button text size */
+        }
+        
+        #send-btn:hover {
+            background-color: #00cc6a;
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #000000;
+            margin-top: 2rem;
+            border-top: 2px solid #00ff88;
+            font-size: 0.8rem; /* Smaller footer text */
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            #chat-container {
+                height: 400px;
+                padding: 0.8rem;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 0.7rem;
+            }
+            
+            .chatbot-header h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">Bi-Alphabetical Search</a>
+    </nav>
+
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <h2>Dual-Letter Search System</h2>
+            <p>Words are searched based on their first two letters (e.g., "apple" → a/p.json)</p>
+            <p style="font-size: 0.85rem; margin-top: 0.3rem;">Note: I ignore pronouns, question words, and helping verbs.</p>
+        </div>
+        
+        <div id="chat-container"></div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Type a word (e.g., 'apple', 'banana')..." autofocus>
+            <button id="send-btn">Search</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Flovvnetic.io Dual-Letter Search. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // [Previous JavaScript code remains exactly the same]
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Words to ignore (pronouns, question words, helping verbs)
+        const IGNORE_WORDS = new Set([
+            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
+            'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their',
+            'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'whose', 'this', 'that', 'these', 'those', 'am', 'is',
+            'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a',
+            'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about',
+            'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+            'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where',
+            'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
+            'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now'
+        ]);
+
+        // Cache for loaded data files
+        const dataCache = {};
+
+        function addMessage(sender, message, isHTML = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${sender}-message`;
+            
+            if (isHTML) {
+                messageDiv.innerHTML = message;
+            } else {
+                messageDiv.textContent = message;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function createResultBox(term, definition, path) {
+            const box = document.createElement('div');
+            box.className = 'result-box';
+            
+            const titleElement = document.createElement('div');
+            titleElement.className = 'result-title';
+            titleElement.textContent = term.charAt(0).toUpperCase() + term.slice(1);
+            
+            const pathElement = document.createElement('div');
+            pathElement.className = 'search-path';
+            pathElement.textContent = `Searched path: ${path}.json`;
+            
+            const contentElement = document.createElement('div');
+            contentElement.innerHTML = definition;
+            
+            box.appendChild(titleElement);
+            box.appendChild(contentElement);
+            box.appendChild(pathElement);
+            
+            return box;
+        }
+
+        async function loadDataFile(firstLetter, secondLetter) {
+            const path = `${firstLetter}/${secondLetter}`;
+            
+            // Check cache first
+            if (dataCache[path]) {
+                return dataCache[path];
+            }
+
+            try {
+                const response = await fetch(`data/${path}.json`);
+                if (!response.ok) throw new Error('File not found');
+                
+                const data = await response.json();
+                dataCache[path] = data; // Cache the data
+                return data;
+            } catch (error) {
+                console.error(`Error loading ${path}.json:`, error);
+                return null;
+            }
+        }
+
+        function processWord(word) {
+            // Clean the word: lowercase and remove non-alphabetic characters
+            const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
+            
+            // Need at least 2 characters to determine the path
+            if (cleanWord.length < 2 || IGNORE_WORDS.has(cleanWord)) {
+                return null;
+            }
+            
+            return {
+                firstLetter: cleanWord[0],
+                secondLetter: cleanWord[1],
+                original: cleanWord
+            };
+        }
+
+        async function searchTerm(wordInfo) {
+            const { firstLetter, secondLetter, original } = wordInfo;
+            const path = `${firstLetter}/${secondLetter}`;
+            
+            const data = await loadDataFile(firstLetter, secondLetter);
+            
+            if (!data) {
+                return {
+                    found: false,
+                    message: `No data available for path: ${path}.json`
+                };
+            }
+            
+            // Check for exact match first
+            if (data[original]) {
+                return {
+                    found: true,
+                    term: original,
+                    definition: data[original],
+                    path: path
+                };
+            }
+            
+            // Check for partial matches (words that start with these letters)
+            for (const [key, value] of Object.entries(data)) {
+                if (key.startsWith(original)) {
+                    return {
+                        found: true,
+                        term: key,
+                        definition: value,
+                        path: path
+                    };
+                }
+            }
+            
+            return {
+                found: false,
+                message: `No definition found for "${original}" in ${path}.json`
+            };
+        }
+
+        async function handleUserInput() {
+            const query = userInput.value.trim();
+            if (!query) return;
+            
+            addMessage('user', query);
+            userInput.value = '';
+            
+            // Show loading indicator
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'bot-message loading';
+            loadingMsg.textContent = 'Searching knowledge base...';
+            chatContainer.appendChild(loadingMsg);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Process the word
+            const wordInfo = processWord(query.split(/\s+/)[0]); // Take first word only
+            
+            if (!wordInfo) {
+                chatContainer.removeChild(loadingMsg);
+                addMessage('bot', "Please enter a meaningful word with at least 2 alphabetic characters (ignoring pronouns and common words).");
+                return;
+            }
+            
+            // Search for the term
+            const searchResult = await searchTerm(wordInfo);
+            
+            // Remove loading indicator
+            chatContainer.removeChild(loadingMsg);
+            
+            if (!searchResult.found) {
+                addMessage('bot', searchResult.message);
+                return;
+            }
+            
+            // Display result
+            const resultBox = createResultBox(
+                searchResult.term,
+                searchResult.definition,
+                searchResult.path
+            );
+            chatContainer.appendChild(resultBox);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', handleUserInput);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserInput();
+        });
+
+        // Initial message
+        addMessage('bot', "Welcome to the Dual-Letter Search System!");
+        addMessage('bot', "Enter a word and I'll search based on its first two letters.");
+        addMessage('bot', "Example: 'apple' → searches data/a/p.json");
     </script>
 </body>
 </html>
