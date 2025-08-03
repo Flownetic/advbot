@@ -48,7 +48,7 @@
     "alchemy": "Alchemy was an ancient practice combining chemistry and philosophy.",
     "algorithm": "An algorithm is a step-by-step procedure for calculations.",
     "alpaca": "Alpacas are domesticated South American camelids.",
-    "altitude": "Altitude is height above sea level."
+    "altitude": "Altitude is height above sea level.",
     "algorithm": "A set of rules or instructions designed to solve problems or perform computations.",
     "api": "Application Programming Interface - allows software applications to communicate with each other.",
     "ai": "Artificial Intelligence - computer systems performing tasks normally requiring human intelligence.",
@@ -98,7 +98,7 @@
     "antispyware": "Software that detects and removes spyware programs.",
     "aosp": "Android Open Source Project - the open-source foundation of Android.",
     "apache": "Open-source web server software and foundation.",
-    "applet": "A small application designed to run within another program."
+    "applet": "A small application designed to run within another program.",
     "artifact": "In software development, any document or deliverable produced during development",
     "asymmetric encryption": "Cryptographic system using public and private key pairs",
     "atomic commit": "Database operation where all changes succeed or none do",
@@ -148,7 +148,7 @@
     "agile manifesto": "Foundational document for agile software development",
     "air gapping": "Security measure isolating computer from unsecured networks",
     "algebraic data type": "Composite type formed by combining other types",
-    "algorithmic bias": "Systematic errors in computer systems creating unfair outcomes"
+    "algorithmic bias": "Systematic errors in computer systems creating unfair outcomes",
     "asynchronous": "Operations that occur independently of the main program flow",
     "atomicity": "Database property where transactions are all-or-nothing",
     "abstraction layer": "Software layer that hides complex implementation details",
@@ -199,7 +199,7 @@
     "a/b test framework": "System for running controlled experiments",
     "access control list": "Rules specifying users' system permissions",
     "activex": "Microsoft's deprecated component object technology",
-    "adversarial network": "Machine learning system with competing networks"
+    "adversarial network": "Machine learning system with competing networks",
     "anchor text": "The clickable text in a hyperlink, important for SEO",
     "android sdk": "Software development kit for creating Android apps",
     "angularjs": "JavaScript-based open-source front-end web framework",
