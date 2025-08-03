@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alphabetical Chatbot - Flovvnetic.io</title>
+    <title>Advanced Alphabetical Chatbot - Flovvnetic.io</title>
     <style>
         /* Global Styles */
         * {
@@ -101,6 +101,20 @@
             color: #e0e0e0;
         }
         
+        .result-box {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #252525;
+            border-radius: 8px;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+        
         .loading {
             color: #888;
             font-style: italic;
@@ -169,25 +183,25 @@
 </head>
 <body>
     <nav>
-        <a href="#" class="logo">Alphabetical Chatbot</a>
+        <a href="#" class="logo">Advanced Alphabetical Search</a>
     </nav>
 
     <div class="chatbot-container">
         <div class="chatbot-header">
-            <h2>Alphabetical Knowledge Base</h2>
-            <p>Ask about any term from A-Z</p>
+            <h2>Nested Alphabetical Knowledge Base</h2>
+            <p>Enter a sentence to search through our A-Z knowledge hierarchy</p>
         </div>
         
         <div id="chat-container"></div>
         
         <div class="chat-input-container">
-            <input type="text" id="user-input" placeholder="Type a word starting with A-Z..." autofocus>
-            <button id="send-btn">Send</button>
+            <input type="text" id="user-input" placeholder="Type a sentence (e.g., 'apple banana cherry')..." autofocus>
+            <button id="send-btn">Search</button>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2023 Flovvnetic.io Style. All rights reserved.</p>
+        <p>&copy; 2023 Flovvnetic.io Advanced Search. All rights reserved.</p>
     </footer>
 
     <script>
@@ -195,15 +209,22 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
+        // Words to ignore (question words and single characters)
+        const IGNORE_WORDS = new Set([
+            'what', 'where', 'when', 'why', 'how', 'who', 'whom', 'whose', 'which',
+            'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could', 'will',
+            'would', 'should', 'may', 'might', 'must', 'a', 'an', 'the', 'and', 'or',
+            'but', 'of', 'to', 'in', 'on', 'at', 'for', 'with', 'as', 'by', 'from'
+        ]);
+
         // Cache for loaded data files
         const dataCache = {};
 
-        function addMessage(sender, message) {
+        function addMessage(sender, message, isHTML = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `${sender}-message`;
             
-            // Check if message contains HTML tags
-            if (/<[a-z][\s\S]*>/i.test(message)) {
+            if (isHTML) {
                 messageDiv.innerHTML = message;
             } else {
                 messageDiv.textContent = message;
@@ -213,44 +234,75 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        async function loadDataFile(letter) {
+        function createResultBox(title, content) {
+            const box = document.createElement('div');
+            box.className = 'result-box';
+            
+            const titleElement = document.createElement('div');
+            titleElement.className = 'result-title';
+            titleElement.textContent = title;
+            
+            const contentElement = document.createElement('div');
+            contentElement.innerHTML = content;
+            
+            box.appendChild(titleElement);
+            box.appendChild(contentElement);
+            
+            return box;
+        }
+
+        async function loadNestedData(path) {
             // Check cache first
-            if (dataCache[letter]) {
-                return dataCache[letter];
+            if (dataCache[path]) {
+                return dataCache[path];
             }
 
             try {
-                addMessage('bot', `Loading ${letter.toUpperCase()} keywords...`);
-                const response = await fetch(`data/${letter.toUpperCase()}.json`);
+                const response = await fetch(`data/${path}.json`);
                 if (!response.ok) throw new Error('File not found');
                 
                 const data = await response.json();
-                dataCache[letter] = data; // Cache the data
+                dataCache[path] = data; // Cache the data
                 return data;
             } catch (error) {
-                console.error(`Error loading ${letter}.json:`, error);
+                console.error(`Error loading ${path}.json:`, error);
                 return null;
             }
         }
 
-        function findResponse(data, query) {
-            if (!data) return "I don't have information for that letter yet.";
+        function processInput(text) {
+            // Convert to lowercase and remove punctuation
+            const cleanText = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, '');
             
-            const cleanQuery = query.toLowerCase().trim();
+            // Split into words and filter out ignored words and single characters
+            return cleanText.split(/\s+/)
+                .filter(word => word.length > 1 && !IGNORE_WORDS.has(word));
+        }
+
+        async function searchForTerm(pathParts, term) {
+            const path = pathParts.join('/');
+            const data = await loadNestedData(path);
             
-            // Exact match check
-            if (data[cleanQuery]) {
-                return data[cleanQuery];
+            if (!data) {
+                return { found: false, message: `No data available for path: ${path}` };
             }
             
-            // Partial match check
-            for (const [keyword, response] of Object.entries(data)) {
-                if (cleanQuery.includes(keyword.toLowerCase())) {
-                    return response;
+            // Check for exact match first
+            if (data[term]) {
+                return { found: true, result: data[term] };
+            }
+            
+            // Check for partial matches
+            for (const [key, value] of Object.entries(data)) {
+                if (term.includes(key) {
+                    return { found: true, result: value };
+                }
+                if (key.includes(term)) {
+                    return { found: true, result: value };
                 }
             }
             
-            return "I couldn't find a matching response for that query. Try another word starting with the same letter.";
+            return { found: false, message: `No definition found for "${term}" in ${path}` };
         }
 
         async function handleUserInput() {
@@ -260,15 +312,61 @@
             addMessage('user', query);
             userInput.value = '';
             
-            const firstChar = query[0].toLowerCase();
-            if (!/[a-z]/.test(firstChar)) {
-                addMessage('bot', "Please start your query with a letter from A-Z.");
+            // Show loading indicator
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'bot-message loading';
+            loadingMsg.textContent = 'Searching knowledge base...';
+            chatContainer.appendChild(loadingMsg);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Process the input
+            const searchTerms = processInput(query);
+            
+            if (searchTerms.length === 0) {
+                chatContainer.removeChild(loadingMsg);
+                addMessage('bot', "Please enter meaningful words to search (avoid question words and single letters).");
                 return;
             }
             
-            const data = await loadDataFile(firstChar);
-            const response = findResponse(data, query);
-            addMessage('bot', response);
+            // Build the path from the first letters of each term
+            const pathParts = [];
+            const results = [];
+            
+            for (const term of searchTerms) {
+                const firstLetter = term[0].toLowerCase();
+                if (!/[a-z]/.test(firstLetter)) continue;
+                
+                pathParts.push(firstLetter);
+                const searchResult = await searchForTerm(pathParts, term);
+                
+                if (searchResult.found) {
+                    results.push({
+                        term: term,
+                        definition: searchResult.result
+                    });
+                }
+            }
+            
+            // Remove loading indicator
+            chatContainer.removeChild(loadingMsg);
+            
+            if (results.length === 0) {
+                addMessage('bot', "No definitions found for any of the search terms. Try different words.");
+                return;
+            }
+            
+            // Display results
+            addMessage('bot', `Found ${results.length} definition(s):`);
+            
+            for (const result of results) {
+                const resultBox = createResultBox(
+                    result.term.charAt(0).toUpperCase() + result.term.slice(1),
+                    result.definition
+                );
+                chatContainer.appendChild(resultBox);
+            }
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         // Event listeners
@@ -278,7 +376,8 @@
         });
 
         // Initial message
-        addMessage('bot', "Hello! I'm an alphabetical knowledge chatbot. Ask about any word starting with A-Z.");
+        addMessage('bot', "Welcome to the Advanced Alphabetical Search! Enter a sentence and I'll search for each meaningful word in our nested A-Z knowledge base.");
+        addMessage('bot', "Example: Try 'apple banana fruit' to search a/apple.json, then a/b/banana.json, then f/fruit.json");
     </script>
 </body>
 </html>
