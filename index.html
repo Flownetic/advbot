@@ -73,32 +73,28 @@
             overflow-y: auto;
         }
         
-        .user-message {
-            text-align: right;
-            margin: 8px 0;
-            padding: 10px 15px;
-            background-color: #003d1f;
-            border-radius: 18px;
-            display: inline-block;
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
             max-width: 80%;
-            float: right;
+            line-height: 1.5;
+            position: relative;
             clear: both;
+        }
+        
+        .user-message {
+            background-color: #003d1f;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
             border: 1px solid #00a55a;
-            color: #e0e0e0;
         }
         
         .bot-message {
-            text-align: left;
-            margin: 8px 0;
-            padding: 10px 15px;
             background-color: #1a1a1a;
-            border-radius: 18px;
-            display: inline-block;
-            max-width: 80%;
-            float: left;
-            clear: both;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
             border: 1px solid #333333;
-            color: #e0e0e0;
         }
         
         .result-box {
@@ -181,7 +177,7 @@
                 padding: 1rem;
             }
             
-            .user-message, .bot-message {
+            .message {
                 max-width: 90%;
             }
         }
@@ -215,6 +211,19 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
+        // Words to ignore (pronouns, question words, helping verbs)
+        const IGNORE_WORDS = new Set([
+            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
+            'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their',
+            'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'whose', 'this', 'that', 'these', 'those', 'am', 'is',
+            'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a',
+            'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about',
+            'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+            'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where',
+            'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
+            'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now'
+        ]);
+
         // Cache for loaded data files
         const dataCache = {};
 
@@ -242,7 +251,7 @@
             
             const pathElement = document.createElement('div');
             pathElement.className = 'search-path';
-            pathElement.textContent = `Searched path: ${path}`;
+            pathElement.textContent = `Searched path: ${path}.json`;
             
             const contentElement = document.createElement('div');
             contentElement.innerHTML = definition;
@@ -280,14 +289,14 @@
             const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
             
             // Need at least 2 characters to determine the path
-            if (cleanWord.length < 2) {
+            if (cleanWord.length < 2 || IGNORE_WORDS.has(cleanWord)) {
                 return null;
             }
             
             return {
                 firstLetter: cleanWord[0],
                 secondLetter: cleanWord[1],
-                original: word.toLowerCase()
+                original: cleanWord
             };
         }
 
@@ -300,7 +309,7 @@
             if (!data) {
                 return {
                     found: false,
-                    message: `No data file found at path: ${path}.json`
+                    message: `No data available for path: ${path}.json`
                 };
             }
             
@@ -351,7 +360,7 @@
             
             if (!wordInfo) {
                 chatContainer.removeChild(loadingMsg);
-                addMessage('bot', "Please enter a word with at least 2 alphabetic characters.");
+                addMessage('bot', "Please enter a meaningful word with at least 2 alphabetic characters (ignoring pronouns and common words).");
                 return;
             }
             
@@ -367,7 +376,6 @@
             }
             
             // Display result
-            addMessage('bot', `Found definition for "${searchResult.term}":`);
             const resultBox = createResultBox(
                 searchResult.term,
                 searchResult.definition,
@@ -387,7 +395,7 @@
         addMessage('bot', "Welcome to the Dual-Letter Search System!");
         addMessage('bot', "Enter a word and I'll search based on its first two letters.");
         addMessage('bot', "Example: 'apple' → searches data/a/p.json");
-        addMessage('bot', "Example: 'banana' → searches data/b/a.json");
+        addMessage('bot', "Note: I ignore pronouns, question words, and helping verbs.");
     </script>
 </body>
 </html>
