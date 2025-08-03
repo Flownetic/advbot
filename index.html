@@ -3,72 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alphabetical Chatbot</title>
+    <title>Alphabetical Chatbot - Flovvnetic.io</title>
     <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: #000000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        /* Chatbot Container */
+        .chatbot-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        #chat-container {
-            border: 1px solid #ddd;
+            margin: 3rem auto;
+            background-color: #1e1e1e;
             border-radius: 8px;
-            height: 400px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+            border: 1px solid #333333;
+        }
+        
+        .chatbot-header {
+            background-color: #000000;
+            padding: 1.5rem;
+            border-bottom: 2px solid #00ff88;
+            text-align: center;
+        }
+        
+        .chatbot-header h2 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chatbot-header p {
+            color: #b0b0b0;
+        }
+        
+        #chat-container {
+            height: 500px;
+            padding: 1.5rem;
+            background-color: #121212;
             overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 10px;
         }
-        #user-input {
-            width: calc(100% - 80px);
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        #send-btn {
-            width: 70px;
-            padding: 8px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+        
         .user-message {
             text-align: right;
-            margin: 5px;
-            padding: 8px;
-            background-color: #e3f2fd;
-            border-radius: 8px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            background-color: #003d1f;
+            border-radius: 18px;
             display: inline-block;
-            max-width: 70%;
+            max-width: 80%;
             float: right;
             clear: both;
+            border: 1px solid #00a55a;
+            color: #e0e0e0;
         }
+        
         .bot-message {
             text-align: left;
-            margin: 5px;
-            padding: 8px;
-            background-color: #f1f1f1;
-            border-radius: 8px;
+            margin: 8px 0;
+            padding: 10px 15px;
+            background-color: #1a1a1a;
+            border-radius: 18px;
             display: inline-block;
-            max-width: 70%;
+            max-width: 80%;
             float: left;
             clear: both;
+            border: 1px solid #333333;
+            color: #e0e0e0;
         }
+        
         .loading {
             color: #888;
             font-style: italic;
         }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 1rem;
+            background-color: #000000;
+            border-top: 1px solid #333333;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background-color: #1e1e1e;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        
+        #user-input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+        
+        #send-btn {
+            margin-left: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: #00ff88;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #send-btn:hover {
+            background-color: #00cc6a;
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #000000;
+            margin-top: 3rem;
+            border-top: 2px solid #00ff88;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            #chat-container {
+                height: 400px;
+                padding: 1rem;
+            }
+            
+            .user-message, .bot-message {
+                max-width: 90%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Alphabetical Chatbot</h1>
-    <div id="chat-container"></div>
-    <div>
-        <input type="text" id="user-input" placeholder="Type your message...">
-        <button id="send-btn">Send</button>
+    <nav>
+        <a href="#" class="logo">Alphabetical Chatbot</a>
+    </nav>
+
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <h2>Alphabetical Knowledge Base</h2>
+            <p>Ask about any term from A-Z</p>
+        </div>
+        
+        <div id="chat-container"></div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Type a word starting with A-Z..." autofocus>
+            <button id="send-btn">Send</button>
+        </div>
     </div>
+
+    <footer>
+        <p>&copy; 2023 Flovvnetic.io Style. All rights reserved.</p>
+    </footer>
 
     <script>
         const chatContainer = document.getElementById('chat-container');
@@ -81,7 +201,14 @@
         function addMessage(sender, message) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `${sender}-message`;
-            messageDiv.textContent = message;
+            
+            // Check if message contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(message)) {
+                messageDiv.innerHTML = message;
+            } else {
+                messageDiv.textContent = message;
+            }
+            
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -123,7 +250,7 @@
                 }
             }
             
-            return "I couldn't find a matching response for that query.";
+            return "I couldn't find a matching response for that query. Try another word starting with the same letter.";
         }
 
         async function handleUserInput() {
@@ -151,7 +278,7 @@
         });
 
         // Initial message
-        addMessage('bot', "Hello! I'm an alphabetical chatbot. Start your query with any letter A-Z.");
+        addMessage('bot', "Hello! I'm an alphabetical knowledge chatbot. Ask about any word starting with A-Z.");
     </script>
 </body>
 </html>
