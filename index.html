@@ -3,430 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flovvnetic.io - AI Chatbot Demo</title>
+    <title>Alphabetical Chatbot</title>
     <style>
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background-color: #121212;
-            color: #e0e0e0;
-            line-height: 1.6;
-        }
-        
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            background-color: #000000;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 2px solid #00ff88;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00ff88;
-            text-decoration: none;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #00ff88;
-        }
-        
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        /* Chatbot Section */
-        .chatbot-container {
+            font-family: Arial, sans-serif;
             max-width: 800px;
-            margin: 3rem auto;
-            background-color: #1e1e1e;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #chat-container {
+            border: 1px solid #ddd;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
-            border: 1px solid #333333;
-        }
-        
-        .chatbot-header {
-            background-color: #000000;
-            padding: 1.5rem;
-            border-bottom: 2px solid #00ff88;
-            text-align: center;
-        }
-        
-        .chatbot-header h2 {
-            color: #00ff88;
-            margin-bottom: 0.5rem;
-        }
-        
-        .chatbot-header p {
-            color: #b0b0b0;
-        }
-        
-        .chat-messages {
-            height: 500px;
+            height: 400px;
             overflow-y: auto;
-            padding: 1.5rem;
-            background-color: #121212;
+            padding: 10px;
+            margin-bottom: 10px;
         }
-        
-        .message {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            max-width: 80%;
-            line-height: 1.5;
-            position: relative;
-        }
-        
-        .user-message {
-            background-color: #003d1f;
-            margin-left: auto;
-            border-bottom-right-radius: 0;
-            border: 1px solid #00a55a;
-        }
-        
-        .bot-message {
-            background-color: #1a1a1a;
-            margin-right: auto;
-            border-bottom-left-radius: 0;
-            border: 1px solid #333333;
-        }
-        
-        .chat-input-container {
-            display: flex;
-            padding: 1rem;
-            background-color: #000000;
-            border-top: 1px solid #333333;
-        }
-        
         #user-input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            background-color: #1e1e1e;
-            border: 1px solid #333333;
+            width: calc(100% - 80px);
+            padding: 8px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            color: #e0e0e0;
-            font-size: 1rem;
         }
-        
-        #user-input:focus {
-            outline: none;
-            border-color: #00ff88;
-        }
-        
-        #send-button {
-            margin-left: 0.5rem;
-            padding: 0.8rem 1.5rem;
-            background-color: #00ff88;
-            color: #121212;
+        #send-btn {
+            width: 70px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
             border: none;
             border-radius: 4px;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        
-        #send-button:hover {
-            background-color: #00cc6a;
-            transform: translateY(-2px);
+        .user-message {
+            text-align: right;
+            margin: 5px;
+            padding: 8px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            display: inline-block;
+            max-width: 70%;
+            float: right;
+            clear: both;
         }
-        
-        .suggested-questions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0 1.5rem 1rem;
-            background-color: #121212;
+        .bot-message {
+            text-align: left;
+            margin: 5px;
+            padding: 8px;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            display: inline-block;
+            max-width: 70%;
+            float: left;
+            clear: both;
         }
-        
-        .suggested-question {
-            padding: 0.5rem 1rem;
-            background-color: #1a1a1a;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            border: 1px solid #333333;
-        }
-        
-        .suggested-question:hover {
-            background-color: #00ff88;
-            color: #121212;
-            border-color: #00ff88;
-        }
-        
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background-color: #000000;
-            margin-top: 3rem;
-            border-top: 2px solid #00ff88;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .footer-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #00ff88;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .chat-messages {
-                height: 400px;
-                padding: 1rem;
-            }
-            
-            .message {
-                max-width: 90%;
-            }
+        .loading {
+            color: #888;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="https://flownetic.github.io/Flovvnetic/" class="logo">Flovvnetic.io</a>
-        <div class="nav-links">
-            <a href="https://flownetic.github.io/Flovvnetic/">Home</a>
-            <a href="https://flownetic.github.io/flovvnetic_services/">Services</a>
-            <a href="https://flownetic.github.io/flovvnetic_about/">About</a>
-            <a href="https://flownetic.github.io/flovvnetic_contact/">Contact</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="chatbot-container">
-            <div class="chatbot-header">
-                <h2>Flovvnetic AI Assistant</h2>
-                <p>Ask me anything about our services, pricing, or AI technology</p>
-            </div>
-            
-            <div class="suggested-questions">
-                <div class="suggested-question">What AI technologies do you use?</div>
-                <div class="suggested-question">How much does a custom chatbot cost?</div>
-                <div class="suggested-question">What industries do you specialize in?</div>
-                <div class="suggested-question">How long does development take?</div>
-            </div>
-            
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot-message">
-                    Hello! I'm your Flovvnetic AI assistant. I can answer questions about:
-                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                        <li>Our custom AI chatbot services</li>
-                        <li>Website development</li>
-                        <li>Pricing and packages</li>
-                        <li>Implementation process</li>
-                    </ul>
-                    How can I help you today?
-                </div>
-            </div>
-            
-            <div class="chat-input-container">
-                <input type="text" id="user-input" placeholder="Type your question here..." autofocus>
-                <button id="send-button">Send</button>
-            </div>
-        </div>
+    <h1>Alphabetical Chatbot</h1>
+    <div id="chat-container"></div>
+    <div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-btn">Send</button>
     </div>
 
-    <footer>
-        <div class="footer-links">
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Privacy Policy</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Terms of Service</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Careers</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
-        </div>
-        <p>&copy; 2023 Flovvnetic.io. All rights reserved.</p>
-    </footer>
-
     <script>
-        // Enhanced knowledge base for Flovvnetic
-        const knowledgeBase = [
-            {
-                keywords: ['ai technology', 'nlp', 'machine learning', 'algorithms'],
-                response: "We use cutting-edge technologies including:<br><br>" +
-                          "<strong>Natural Language Processing (NLP):</strong> For understanding and generating human-like responses<br>" +
-                          "<strong>Machine Learning:</strong> To continuously improve from interactions<br>" +
-                          "<strong>Deep Learning:</strong> For complex pattern recognition<br>" +
-                          "<strong>Neural Networks:</strong> To model sophisticated decision-making processes"
-            },
-            {
-                keywords: ['pricing', 'cost', 'price', 'how much'],
-                response: "Our pricing depends on the complexity of your needs:<br><br>" +
-                          "💰 <strong>Basic Chatbot:</strong> $1,500-$5,000 (pre-built solutions)<br>" +
-                          "💼 <strong>Business Solution:</strong> $5,000-$20,000 (custom features)<br>" +
-                          "🏢 <strong>Enterprise AI:</strong> $20,000+ (fully customized, multi-channel)<br><br>" +
-                          "We offer free consultations to provide accurate pricing for your specific requirements."
-            },
-            {
-                keywords: ['industries', 'sectors', 'specialize'],
-                response: "We serve clients across multiple industries:<br><br>" +
-                          "🛒 <strong>E-commerce:</strong> Product recommendations, 24/7 support<br>" +
-                          "🏥 <strong>Healthcare:</strong> Appointment scheduling, symptom checking<br>" +
-                          "🏦 <strong>Finance:</strong> Account inquiries, fraud detection<br>" +
-                          "🎓 <strong>Education:</strong> Learning assistants, FAQ bots<br><br>" +
-                          "Our solutions are adaptable to virtually any industry."
-            },
-            {
-                keywords: ['timeframe', 'how long', 'development time', 'duration'],
-                response: "Typical project timelines:<br><br>" +
-                          "⏱️ <strong>Simple Chatbot:</strong> 2-4 weeks<br>" +
-                          "⏳ <strong>Custom Solution:</strong> 4-12 weeks<br>" +
-                          "⌛ <strong>Enterprise AI:</strong> 3-6 months<br><br>" +
-                          "Exact timelines depend on complexity, integrations needed, and data availability."
-            },
-            {
-                keywords: ['integration', 'connect', 'api', 'existing systems'],
-                response: "We seamlessly integrate with:<br><br>" +
-                          "• CRM systems (Salesforce, HubSpot)<br>" +
-                          "• E-commerce platforms (Shopify, WooCommerce)<br>" +
-                          "• Help desks (Zendesk, Freshdesk)<br>" +
-                          "• Custom APIs and databases<br><br>" +
-                          "Our team handles all technical integration work."
-            },
-            {
-                keywords: ['hello', 'hi', 'hey'],
-                response: "Hello there! 👋 I'm the Flovvnetic AI assistant. How can I help you learn about our AI solutions today?"
-            },
-            {
-                keywords: ['thanks', 'thank you', 'appreciate'],
-                response: "You're very welcome! 😊 Is there anything else I can help you with regarding our AI services?"
-            }
- 
-        ];
-
-        // Default response
-        const defaultResponse = "I'm sorry, I don't have information about that specific question. " +
-                               "I can help with questions about our:<br><br>" +
-                               "• AI chatbot services<br>" +
-                               "• Pricing and packages<br>" +
-                               "• Implementation process<br>" +
-                               "• Technology stack<br><br>" +
-                               "Could you ask about one of these topics or try rephrasing your question?";
-
-        // DOM elements
-        const chatMessages = document.getElementById('chat-messages');
+        const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-        const suggestedQuestions = document.querySelectorAll('.suggested-question');
+        const sendBtn = document.getElementById('send-btn');
 
-        // Add message to chat
-        function addMessage(text, sender) {
+        // Cache for loaded data files
+        const dataCache = {};
+
+        function addMessage(sender, message) {
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(sender + '-message');
-            
-            // Check if the text contains HTML tags
-            if (/<[a-z][\s\S]*>/i.test(text)) {
-                messageDiv.innerHTML = text;
-            } else {
-                messageDiv.textContent = text;
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            messageDiv.className = `${sender}-message`;
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Get bot response
-        function getBotResponse(question) {
-            const lowerQuestion = question.toLowerCase().trim();
+        async function loadDataFile(letter) {
+            // Check cache first
+            if (dataCache[letter]) {
+                return dataCache[letter];
+            }
+
+            try {
+                addMessage('bot', `Loading ${letter.toUpperCase()} keywords...`);
+                const response = await fetch(`data/${letter.toUpperCase()}.json`);
+                if (!response.ok) throw new Error('File not found');
+                
+                const data = await response.json();
+                dataCache[letter] = data; // Cache the data
+                return data;
+            } catch (error) {
+                console.error(`Error loading ${letter}.json:`, error);
+                return null;
+            }
+        }
+
+        function findResponse(data, query) {
+            if (!data) return "I don't have information for that letter yet.";
             
-            // Check for matches in knowledge base
-            for (const item of knowledgeBase) {
-                if (item.keywords.some(keyword => lowerQuestion.includes(keyword))) {
-                    return item.response;
+            const cleanQuery = query.toLowerCase().trim();
+            
+            // Exact match check
+            if (data[cleanQuery]) {
+                return data[cleanQuery];
+            }
+            
+            // Partial match check
+            for (const [keyword, response] of Object.entries(data)) {
+                if (cleanQuery.includes(keyword.toLowerCase())) {
+                    return response;
                 }
             }
             
-            // Default response
-            return defaultResponse;
+            return "I couldn't find a matching response for that query.";
         }
 
-        // Handle send message
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (message === '') return;
+        async function handleUserInput() {
+            const query = userInput.value.trim();
+            if (!query) return;
             
-            addMessage(message, 'user');
+            addMessage('user', query);
             userInput.value = '';
             
-            // Show typing indicator
-            const typingIndicator = document.createElement('div');
-            typingIndicator.classList.add('message', 'bot-message');
-            typingIndicator.textContent = '...';
-            chatMessages.appendChild(typingIndicator);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const firstChar = query[0].toLowerCase();
+            if (!/[a-z]/.test(firstChar)) {
+                addMessage('bot', "Please start your query with a letter from A-Z.");
+                return;
+            }
             
-            // Simulate thinking delay
-            setTimeout(() => {
-                chatMessages.removeChild(typingIndicator);
-                const response = getBotResponse(message);
-                addMessage(response, 'bot');
-            }, 800 + Math.random() * 800);
+            const data = await loadDataFile(firstChar);
+            const response = findResponse(data, query);
+            addMessage('bot', response);
         }
 
         // Event listeners
-        sendButton.addEventListener('click', sendMessage);
+        sendBtn.addEventListener('click', handleUserInput);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') handleUserInput();
         });
 
-        // Suggested questions
-        suggestedQuestions.forEach(question => {
-            question.addEventListener('click', () => {
-                userInput.value = question.textContent;
-                sendMessage();
-            });
-        });
-
-        // Focus input on page load
-        window.addEventListener('load', () => {
-            userInput.focus();
-        });
+        // Initial message
+        addMessage('bot', "Hello! I'm an alphabetical chatbot. Start your query with any letter A-Z.");
     </script>
 </body>
 </html>
