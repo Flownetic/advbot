@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flovvnetic.io - AI Chatbot Demo</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: #000000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #00ff88;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Chatbot Section */
+        .chatbot-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+            border: 1px solid #333333;
+        }
+        
+        .chatbot-header {
+            background-color: #000000;
+            padding: 1.5rem;
+            border-bottom: 2px solid #00ff88;
+            text-align: center;
+        }
+        
+        .chatbot-header h2 {
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chatbot-header p {
+            color: #b0b0b0;
+        }
+        
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background-color: #121212;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .user-message {
+            background-color: #003d1f;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+            border: 1px solid #00a55a;
+        }
+        
+        .bot-message {
+            background-color: #1a1a1a;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            border: 1px solid #333333;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 1rem;
+            background-color: #000000;
+            border-top: 1px solid #333333;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background-color: #1e1e1e;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        
+        #user-input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+        
+        #send-button {
+            margin-left: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: #00ff88;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #send-button:hover {
+            background-color: #00cc6a;
+            transform: translateY(-2px);
+        }
+        
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0 1.5rem 1rem;
+            background-color: #121212;
+        }
+        
+        .suggested-question {
+            padding: 0.5rem 1rem;
+            background-color: #1a1a1a;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: 1px solid #333333;
+        }
+        
+        .suggested-question:hover {
+            background-color: #00ff88;
+            color: #121212;
+            border-color: #00ff88;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #000000;
+            margin-top: 3rem;
+            border-top: 2px solid #00ff88;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #00ff88;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .chat-messages {
+                height: 400px;
+                padding: 1rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="https://flownetic.github.io/Flovvnetic/" class="logo">Flovvnetic.io</a>
+        <div class="nav-links">
+            <a href="https://flownetic.github.io/Flovvnetic/">Home</a>
+            <a href="https://flownetic.github.io/flovvnetic_services/">Services</a>
+            <a href="https://flownetic.github.io/flovvnetic_about/">About</a>
+            <a href="https://flownetic.github.io/flovvnetic_contact/">Contact</a>
+            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <h2>Flovvnetic AI Assistant</h2>
+                <p>Ask me anything about our services, pricing, or AI technology</p>
+            </div>
+            
+            <div class="suggested-questions">
+                <div class="suggested-question">What AI technologies do you use?</div>
+                <div class="suggested-question">How much does a custom chatbot cost?</div>
+                <div class="suggested-question">What industries do you specialize in?</div>
+                <div class="suggested-question">How long does development take?</div>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    Hello! I'm your Flovvnetic AI assistant. I can answer questions about:
+                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                        <li>Our custom AI chatbot services</li>
+                        <li>Website development</li>
+                        <li>Pricing and packages</li>
+                        <li>Implementation process</li>
+                    </ul>
+                    How can I help you today?
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" id="user-input" placeholder="Type your question here..." autofocus>
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="https://flownetic.github.io/flovvnetic_soon/">Privacy Policy</a>
+            <a href="https://flownetic.github.io/flovvnetic_soon/">Terms of Service</a>
+            <a href="https://flownetic.github.io/flovvnetic_soon/">Careers</a>
+            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
+        </div>
+        <p>&copy; 2023 Flovvnetic.io. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Enhanced knowledge base for Flovvnetic
+        const knowledgeBase = [
+            {
+                keywords: ['ai technology', 'nlp', 'machine learning', 'algorithms'],
+                response: "We use cutting-edge technologies including:<br><br>" +
+                          "<strong>Natural Language Processing (NLP):</strong> For understanding and generating human-like responses<br>" +
+                          "<strong>Machine Learning:</strong> To continuously improve from interactions<br>" +
+                          "<strong>Deep Learning:</strong> For complex pattern recognition<br>" +
+                          "<strong>Neural Networks:</strong> To model sophisticated decision-making processes"
+            },
+            {
+                keywords: ['pricing', 'cost', 'price', 'how much'],
+                response: "Our pricing depends on the complexity of your needs:<br><br>" +
+                          "💰 <strong>Basic Chatbot:</strong> $1,500-$5,000 (pre-built solutions)<br>" +
+                          "💼 <strong>Business Solution:</strong> $5,000-$20,000 (custom features)<br>" +
+                          "🏢 <strong>Enterprise AI:</strong> $20,000+ (fully customized, multi-channel)<br><br>" +
+                          "We offer free consultations to provide accurate pricing for your specific requirements."
+            },
+            {
+                keywords: ['industries', 'sectors', 'specialize'],
+                response: "We serve clients across multiple industries:<br><br>" +
+                          "🛒 <strong>E-commerce:</strong> Product recommendations, 24/7 support<br>" +
+                          "🏥 <strong>Healthcare:</strong> Appointment scheduling, symptom checking<br>" +
+                          "🏦 <strong>Finance:</strong> Account inquiries, fraud detection<br>" +
+                          "🎓 <strong>Education:</strong> Learning assistants, FAQ bots<br><br>" +
+                          "Our solutions are adaptable to virtually any industry."
+            },
+            {
+                keywords: ['timeframe', 'how long', 'development time', 'duration'],
+                response: "Typical project timelines:<br><br>" +
+                          "⏱️ <strong>Simple Chatbot:</strong> 2-4 weeks<br>" +
+                          "⏳ <strong>Custom Solution:</strong> 4-12 weeks<br>" +
+                          "⌛ <strong>Enterprise AI:</strong> 3-6 months<br><br>" +
+                          "Exact timelines depend on complexity, integrations needed, and data availability."
+            },
+            {
+                keywords: ['integration', 'connect', 'api', 'existing systems'],
+                response: "We seamlessly integrate with:<br><br>" +
+                          "• CRM systems (Salesforce, HubSpot)<br>" +
+                          "• E-commerce platforms (Shopify, WooCommerce)<br>" +
+                          "• Help desks (Zendesk, Freshdesk)<br>" +
+                          "• Custom APIs and databases<br><br>" +
+                          "Our team handles all technical integration work."
+            },
+            {
+                keywords: ['hello', 'hi', 'hey'],
+                response: "Hello there! 👋 I'm the Flovvnetic AI assistant. How can I help you learn about our AI solutions today?"
+            },
+            {
+                keywords: ['thanks', 'thank you', 'appreciate'],
+                response: "You're very welcome! 😊 Is there anything else I can help you with regarding our AI services?"
+            },
+            {​ "keywords": ["Elon Musk", "Tesla", "SpaceX", "Neuralink", "X", "The Boring Company", "founder", "CEO", "engineer"],​ "response": "Elon Musk is a business magnate and engineer. He is the founder, CEO, and chief engineer of SpaceX; CEO and product architect of Tesla, Inc.; and founder of The Boring Company and Neuralink. He is also the owner of the social media platform X (formerly Twitter)."​ },​ {​ "keywords": ["Jeff Bezos", "Amazon", "Blue Origin", "e-commerce", "aerospace", "founder"],​ "response": "Jeff Bezos is an American entrepreneur and media proprietor. He is the founder, executive chairman, and former president and CEO of Amazon. He is also the founder of the aerospace manufacturer and sub-orbital spaceflight services company Blue Origin."​ },​ {​ "keywords": ["Bill Gates", "Microsoft", "Gates Foundation", "co-founder", "philanthropist", "software"],​ "response": "Bill Gates is an American business magnate, software developer, and philanthropist. He is a co-founder of Microsoft, which he built into the world's largest PC software company. He and his wife, Melinda French Gates, co-founded the Bill & Melinda Gates Foundation."​ },​ {​ "keywords": ["Mark Zuckerberg", "Meta", "Facebook", "co-founder", "CEO", "social media"],​ "response": "Mark Zuckerberg is an American business magnate and software engineer. He is the co-founder, chairman, and CEO of Meta Platforms (formerly Facebook, Inc.), and is widely recognized for his role in creating Facebook, a global social networking service."​ },​ {​ "keywords": ["Larry Page", "Sergey Brin", "Google", "Alphabet", "co-founders"],​ "response": "Larry Page and Sergey Brin are American computer scientists and internet entrepreneurs who co-founded Google. They are also co-founders of Alphabet Inc., Google's parent company, where Page served as CEO and Brin as president until 2019."​ },​ {​ "keywords": ["Satya Nadella", "Microsoft", "CEO", "cloud computing", "Azure"],​ "response": "Satya Nadella is an Indian-American business executive. He is the chairman and CEO of Microsoft. Under his leadership, the company has shifted its focus to cloud computing, with its Azure platform becoming a major competitor to Amazon Web Services."​ },​ {​ "keywords": ["Tim Cook", "Apple", "CEO", "operations", "technology"],​ "response": "Tim Cook is an American business executive who has been the CEO of Apple since 2011. He previously served as the company's chief operating officer and is credited with streamlining Apple's supply chain and operations."​ },​ {​ "keywords": ["Sundar Pichai", "Google", "Alphabet", "CEO", "software"],​ "response": "Sundar Pichai is an Indian-American business executive. He is the CEO of Alphabet Inc. and its subsidiary Google. He is a key figure in the development of Google products, including Chrome, Android, and Google Search."​ },​ {​ "keywords": ["Jensen Huang", "NVIDIA", "CEO", "co-founder", "graphics processing", "semiconductors"],​ "response": "Jensen Huang is a Taiwanese-American business executive and electrical engineer. He is the co-founder, president, and CEO of NVIDIA, a company that designs graphics processing units (GPUs) for the gaming and professional markets, as well as chipsets for mobile computing and automotive markets."​ },​ {​ "keywords": ["Andy Jassy", "Amazon", "CEO", "AWS", "cloud computing"],​ "response": "Andy Jassy is an American business executive. He is the president and CEO of Amazon. He previously led Amazon Web Services (AWS) from its inception, building it into the world's leading cloud computing platform."​ },​ {​ "keywords": ["Reed Hastings", "Netflix", "co-founder", "CEO", "streaming", "entertainment"],​ "response": "Reed Hastings is an American businessman and co-founder of Netflix. He served as the company's chairman and CEO for many years, overseeing its transformation from a DVD-by-mail service to a global streaming and content production powerhouse."​ },​ {​ "keywords": ["Marc Benioff", "Salesforce", "CEO", "cloud computing", "CRM"],​ "response": "Marc Benioff is an American internet entrepreneur and businessman. He is the co-founder, chairman, and CEO of Salesforce, a leading cloud-based software company specializing in customer relationship management (CRM)."​ },​ {​ "keywords": ["Jack Dorsey", "Twitter", "Square", "Block", "co-founder", "payments"],​ "response": "Jack Dorsey is an American internet entrepreneur and philanthropist. He is the co-founder and former CEO of Twitter and the co-founder and CEO of Block, Inc. (formerly Square, Inc.), a financial services and digital payments company."​ },​ {​ "keywords": ["Evan Spiegel", "Snapchat", "Snap Inc.", "co-founder", "CEO"],​ "response": "Evan Spiegel is a French-American businessman. He is the co-founder and CEO of Snap Inc., the company that developed the popular social media application Snapchat. He is known for pioneering the concept of disappearing messages."​ },​ {​ "keywords": ["Brian Chesky", "Airbnb", "CEO", "co-founder", "travel", "hospitality"],​ "response": "Brian Chesky is an American businessman and industrial designer. He is the co-founder and CEO of Airbnb, a popular online marketplace for lodging and tourism activities."​ },​ {​ "keywords": ["Travis Kalanick", "Uber", "co-founder", "technology", "ride-sharing"],​ "response": "Travis Kalanick is an American entrepreneur. He is the co-founder and former CEO of Uber, a ride-sharing and food delivery company. He is widely credited with building Uber into a global transportation giant."​ },​ {​ "keywords": ["Dara Khosrowshahi", "Uber", "CEO", "travel", "Expedia"],​ "response": "Dara Khosrowshahi is an Iranian-American businessman. He is the CEO of Uber, having taken over from co-founder Travis Kalanick. He previously served as the CEO of Expedia Group."​ },​ {​ "keywords": ["Daniel Ek", "Spotify", "CEO", "co-founder", "music streaming"],​ "response": "Daniel Ek is a Swedish billionaire entrepreneur. He is the co-founder and CEO of the music streaming service Spotify, which he has grown into one of the largest music services in the world."​ },​ {​ "keywords": ["Jan Koum", "WhatsApp", "co-founder", "messaging", "Facebook"],​ "response": "Jan Koum is a Ukrainian-American billionaire entrepreneur. He is the co-founder of WhatsApp, a mobile messaging application that was acquired by Facebook in 2014 for over $19 billion."​ },​ {​ "keywords": ["Kevin Systrom", "Instagram", "co-founder", "social media", "photo sharing"],​ "response": "Kevin Systrom is an American entrepreneur and software engineer. He is the co-founder of Instagram, a mobile photo and video sharing social networking service that was acquired by Facebook in 2012."​ },​ {​ "keywords": ["Steve Wozniak", "Apple", "co-founder", "engineer", "personal computer"],​ "response": "Steve Wozniak is an American electronics engineer and computer scientist. He is a co-founder of Apple, alongside Steve Jobs, and is widely credited as the inventor of the Apple I and Apple II computers, which helped launch the personal computer revolution."​ },​ {​ "keywords": ["Michael Dell", "Dell Technologies", "founder", "CEO", "computers"],​ "response": "Michael Dell is an American billionaire businessman and entrepreneur. He is the founder, chairman, and CEO of Dell Technologies, one of the world's largest technology infrastructure companies."​ },​ {​ "keywords": ["Eric Schmidt", "Google", "former CEO", "Alphabet", "software"],​ "response": "Eric Schmidt is an American businessman and software engineer. He served as the CEO of Google from 2001 to 2011 and as its executive chairman from 2011 to 2015. He played a crucial role in the company's growth and expansion."​ },​ {​ "keywords": ["Sheryl Sandberg", "Meta", "COO", "Facebook", "Lean In"],​ "response": "Sheryl Sandberg is an American business executive and philanthropist. She served as the chief operating officer (COO) of Meta Platforms (formerly Facebook) for 14 years. She is also the author of the book 'Lean In.'"​ },​ {​ "keywords": ["Susan Wojcicki", "YouTube", "former CEO", "Google", "technology"],​ "response": "Susan Wojcicki is a Polish-American technology executive. She was the CEO of YouTube for nine years, overseeing its growth into the world's dominant video platform. She was also one of the earliest employees at Google."​ },​ {​ "keywords": ["Geoffrey Hinton", "AI", "deep learning", "Godfather of AI"],​ "response": "Geoffrey Hinton is a British-Canadian cognitive psychologist and computer scientist. He is a leading figure in the field of deep learning and is often referred to as one of the 'Godfathers of AI' for his foundational work on neural networks."​ },​ {​ "keywords": ["Yann LeCun", "Meta AI", "AI researcher", "deep learning"],​ "response": "Yann LeCun is a French computer scientist and AI researcher. He is the Chief AI Scientist at Meta and a professor at New York University. He is a key figure in deep learning and is known for his work on convolutional neural networks."​ },​ {​ "keywords": ["Demis Hassabis", "DeepMind", "Google AI", "CEO", "AI research"],​ "response": "Demis Hassabis is a British artificial intelligence researcher and neuroscientist. He is the co-founder and CEO of DeepMind, an AI company that was acquired by Google. He is known for leading research that has resulted in breakthroughs like AlphaGo."​ },​ {​ "keywords": ["Sam Altman", "OpenAI", "CEO", "AI research", "ChatGPT"],​ "response": "Sam Altman is an American entrepreneur and investor. He is the CEO of OpenAI, a research company focused on developing safe and beneficial artificial intelligence. He is a key figure in the development of advanced AI models like GPT-4."​ },​ {​ "keywords": ["Ilya Sutskever", "OpenAI", "co-founder", "AI research"],​ "response": "Ilya Sutskever is a Russian-Canadian computer scientist. He is a co-founder and former chief scientist of OpenAI. He is a prominent researcher in the field of deep learning and is known for his work with neural networks."​ },​ {​ "keywords": ["Andrej Karpathy", "Tesla", "AI", "Autopilot", "deep learning"],​ "response": "Andrej Karpathy is a Slovak-Canadian computer scientist. He is a leading expert in computer vision and deep learning. He served as the director of AI and Autopilot Vision at Tesla, where he helped develop the company's autonomous driving systems."​ },​ {​ "keywords": ["Fei-Fei Li", "Stanford", "AI", "ImageNet", "computer vision"],​ "response": "Fei-Fei Li is a Chinese-American computer scientist. She is a professor at Stanford University and co-director of the Stanford Institute for Human-Centered AI. She is known for her foundational work on ImageNet, a large visual database that helped accelerate the development of deep learning."​ },​ {​ "keywords": ["Andrew Ng", "AI Fund", "Coursera", "Google Brain"],​ "response": "Andrew Ng is a British-American computer scientist and entrepreneur. He is the co-founder of Coursera, an online education platform. He is a prominent figure in AI, having founded Google Brain and served as a chief scientist at Baidu."​ },​ {​ "keywords": ["Yoshua Bengio", "AI", "deep learning", "Mila", "Godfather of AI"],​ "response": "Yoshua Bengio is a Canadian computer scientist. He is a professor at the University of Montreal and a leading figure in the field of deep learning, often cited as one of the 'Godfathers of AI.' He is known for his work on neural networks and generative models."​ },​ {​ "keywords": ["Jürgen Schmidhuber", "AI", "LSTM", "deep learning"],​ "response": "Jürgen Schmidhuber is a German computer scientist. He is best known for his work on artificial neural networks, particularly his invention of the Long Short-Term Memory (LSTM) network, which is a foundational component of many modern AI applications."​ },​ {​ "keywords": ["Masayoshi Son", "SoftBank", "Vision Fund", "investor", "technology"],​ "response": "Masayoshi Son is a Japanese billionaire technology entrepreneur. He is the founder and CEO of SoftBank Group and the head of its Vision Fund, a large venture capital fund that has invested in many of the world's leading tech companies."​ },​ {​ "keywords": ["Peter Thiel", "PayPal", "Founders Fund", "venture capitalist"],​ "response": "Peter Thiel is a German-American billionaire entrepreneur and venture capitalist. He is a co-founder of PayPal and Palantir Technologies. He is also a partner at Founders Fund, a prominent venture capital firm in Silicon Valley."​ },​ {​ "keywords": ["Marc Andreessen", "Andreessen Horowitz", "a16z", "Netscape", "venture capitalist"],​ "response": "Marc Andreessen is an American entrepreneur and investor. He is the co-founder of the venture capital firm Andreessen Horowitz (a16z). He is also known for co-founding Netscape, one of the first widely used web browsers."​ },​ {​ "keywords": ["Ben Horowitz", "Andreessen Horowitz", "a16z", "venture capitalist", "author"],​ "response": "Ben Horowitz is an American businessman, investor, and author. He is a co-founder and general partner of the venture capital firm Andreessen Horowitz. He is also the author of the book 'The Hard Thing About Hard Things'."​ },​ {​ "keywords": ["Mary Meeker", "Bond Capital", "Kleiner Perkins", "Internet Trends"],​ "response": "Mary Meeker is an American venture capitalist. She is a general partner at Bond Capital and was formerly a partner at Kleiner Perkins. She is best known for her annual 'Internet Trends' report, which provides insights into technology and market trends."​ },​ {​ "keywords": ["Chamath Palihapitiya", "Social Capital", "investor", "venture capitalist"],​ "response": "Chamath Palihapitiya is a Sri Lankan-born Canadian-American venture capitalist. He is the founder and CEO of Social Capital, a venture capital firm. He is known for his early career at Facebook and his active involvement in SPACs (Special Purpose Acquisition Companies)."​ },​ {​ "keywords": ["Cathie Wood", "ARK Invest", "investment", "disruptive innovation", "ETF"],​ "response": "Cathie Wood is an American investor and the founder, CEO, and CIO of ARK Invest, an investment management firm. She is known for her focus on 'disruptive innovation' and managing several actively managed exchange-traded funds (ETFs)."​ },​ {​ "keywords": ["Naval Ravikant", "AngelList", "investor", "entrepreneur", "podcast"],​ "response": "Naval Ravikant is an Indian-American entrepreneur and investor. He is the co-founder and former CEO of AngelList, an online platform for startups. He is also a prominent thought leader in the tech and startup community, known for his podcast and essays."​ },​ {​ "keywords": ["Paul Graham", "Y Combinator", "co-founder", "startup", "investor"],​ "response": "Paul Graham is an English-born American computer scientist, essayist, and investor. He is a co-founder of Y Combinator, a prominent startup accelerator that has funded companies like Airbnb, Dropbox, and Reddit."​ },​ {​ "keywords": ["Sam Bankman-Fried", "FTX", "crypto", "founder", "cryptocurrency"],​ "response": "Sam Bankman-Fried is an American entrepreneur and former billionaire. He is the founder and former CEO of FTX, a cryptocurrency exchange, and Alameda Research, a quantitative trading firm. He was a prominent figure in the crypto industry before the collapse of his companies."​ },​ {​ "keywords": ["Patrick Collison", "Stripe", "CEO", "co-founder", "payments", "technology"],​ "response": "Patrick Collison is an Irish entrepreneur and the CEO and co-founder of Stripe, a financial services and software company that provides payment processing for businesses. He co-founded the company with his brother, John Collison."​ },​ {​ "keywords": ["Alexandr Wang", "Scale AI", "CEO", "artificial intelligence"],​ "response": "Alexandr Wang is an American entrepreneur. He is the founder and CEO of Scale AI, a company that provides data infrastructure for AI and machine learning applications. He is one of the youngest self-made billionaires in the world."​ },​ {​ "keywords": ["Dylan Field", "Figma", "CEO", "co-founder", "design software"],​ "response": "Dylan Field is an American entrepreneur. He is the co-founder and CEO of Figma, a web-based collaborative design tool. He is known for building a company that became a leader in the design software industry."​ },​ {​ "keywords": ["Anne Wojcicki", "23andMe", "CEO", "founder", "biotechnology", "genetics"],​ "response": "Anne Wojcicki is an American entrepreneur and the co-founder and CEO of 23andMe, a personal genomics and biotechnology company. She is a pioneer in the direct-to-consumer genetic testing industry."​ },​ {​ "keywords": ["Whitney Wolfe Herd", "Bumble", "founder", "CEO", "dating app"],​ "response": "Whitney Wolfe Herd is an American entrepreneur. She is the founder of Bumble, a popular dating and social networking app where women make the first move. She also co-founded the dating app Tinder."​ },​ {​ "keywords": ["Arvind Krishna", "IBM", "CEO", "cloud computing", "technology"],​ "response": "Arvind Krishna is an Indian-American business executive. He is the chairman and CEO of IBM. He previously led IBM's cloud and cognitive software business and played a key role in the company's acquisition of Red Hat."​ },​ {​ "keywords": ["Lisa Su", "AMD", "CEO", "president", "semiconductors"],​ "response": "Lisa Su is a Taiwanese-American business executive and electrical engineer. She is the chair and CEO of AMD (Advanced Micro Devices), a semiconductor company. She is credited with revitalizing the company and leading its development of high-performance computing and graphics products."​ },​ {​ "keywords": ["Jensen Huang", "NVIDIA", "CEO", "founder", "graphics processing"],​ "response": "Jensen Huang is a Taiwanese-American businessman. He is the founder, president, and CEO of NVIDIA, a company at the forefront of AI and graphics processing technology."​ },​ {​ "keywords": ["Satya Nadella", "Microsoft", "CEO", "cloud computing"],​ "response": "Satya Nadella is the CEO of Microsoft. He has been instrumental in the company's shift towards cloud computing and a more open, collaborative culture."​ },​ {​ "keywords": ["Tim Cook", "Apple", "CEO", "operations", "technology"],​ "response": "Tim Cook is the CEO of Apple. He is known for his focus on supply chain management and his leadership in navigating the company's continued growth and innovation."​ },​  
+ { "keywords": ["FGTeeV", "Family Gaming Team", "family gaming", "Let's Plays", "skits"],
+"response": "FGTeeV is a family gaming channel featuring the Skylander family. They create
+videos playing a variety of games, from popular titles like Minecraft and Roblox to family-friendly
+mobile games, often with comedic skits and vlogs." }, { "keywords": ["Sidemen", "comedy",
+"gaming", "vlogs", "British YouTubers"], "response": "The Sidemen are a group of seven British
+YouTubers who create a wide range of content, including gaming videos, challenges, comedy
+skits, and vlogs. The group is known for their strong camaraderie and entertaining group
+dynamic." }, { "keywords": ["Kwebbelkop", "Jordi van den Bussche", "gaming", "comedy",
+"vlogs"], "response": "Kwebbelkop, or Jordi van den Bussche, is a Dutch gaming YouTuber. His
+channel is known for its energetic and humorous gaming videos, often featuring games like
+Grand Theft Auto and other popular titles, with an emphasis on funny moments and edits." }, {
+"keywords": ["TheDooo", "gaming", "guitar", "comedy", "vlogs"], "response": "TheDooo is a
+gaming YouTuber who combines comedic gaming videos with his talent for playing the electric
+guitar. His content often features him interacting with other gamers in a humorous way while
+showcasing his musical skills." }, { "keywords": ["LOUD", "gaming", "esports", "Free Fire",
+"Brazil"], "response": "LOUD is a Brazilian esports organization and entertainment group. Their
+YouTube channel is a mix of gaming content, lifestyle vlogs, and behind-the-scenes looks at
+their professional esports teams, particularly in games like 'Free Fire'." }, { "keywords":
+["AuthenticGames", "Marco Túlio", "gaming", "Minecraft", "Brazilian YouTuber"], "response":
+"AuthenticGames is a Brazilian gaming channel created by Marco Túlio. He is one of the most
+popular gaming creators in Brazil, specializing in 'Minecraft' content, including custom maps,
+mod reviews, and 'Let's Plays'." }, { "keywords": ["LazarBeam", "Lannan Eacott", "gaming",
+"Fortnite", "comedy"], "response": "LazarBeam, whose real name is Lannan Eacott, is an
+Australian gaming YouTuber. He gained popularity for his comedic and often rage-fueled
+gameplay videos, primarily focused on the game 'Fortnite'." }, { "keywords": ["W2S", "Harry
+Lewis", "gaming", "FIFA", "Sidemen", "comedy"], "response": "W2S, or Harry Lewis, is a British
+YouTuber and a member of the Sidemen. He is best known for his 'FIFA' gaming videos,
+comedy skits, and challenge videos, which often feature his trademark humor." }, { "keywords":
+["Jelly", "Jelle Van Vucht", "gaming", "Minecraft", "GTA"], "response": "Jelly is a Dutch gaming
+YouTuber known for his energetic and humorous gaming commentary. His content is often
+family-friendly and includes videos on games like 'Minecraft,' 'Grand Theft Auto V,' and other
+popular titles." }, { "keywords": ["SSSniperWolf", "Lia Shelesh", "gaming", "reaction videos",
+"vlogs"], "response": "SSSniperWolf is a YouTuber known for her reaction videos, where she
+provides commentary on viral clips and internet culture. She also creates gaming videos and
+vlogs, making her a prominent female creator on the platform." }, { "keywords": ["Flamingo",
+"Albert Aretz", "gaming", "Roblox", "comedy"], "response": "Flamingo is a gaming channel
+primarily focused on the game 'Roblox.' Hosted by Albert Aretz, the channel is known for its
+comedic commentary, memes, and videos that highlight the bizarre and funny aspects of the
+game." }, { "keywords": ["Typical Gamer", "André Rebelo", "gaming", "Fortnite", "GTA"],
+"response": "Typical Gamer, or André Rebelo, is a Canadian YouTuber known for his gaming
+content, particularly 'Fortnite' and 'Grand Theft Auto V.' He is a popular livestreamer and his
+channel features gameplay, challenges, and commentary." }, { "keywords": ["Sykkuno",
+"gaming", "streamer", "vlogs", "entertainment"], "response": "Sykkuno is an American streamer
+and YouTuber known for his relaxed and friendly personality. He is popular for his gaming
+content, particularly 'Among Us' and other multiplayer games, as well as his vlogs and
+collaborations with other creators." }, { "keywords": ["Valkyrae", "Rachell Hofstetter", "gaming",
+"streamer", "vlogs", "entertainment"], "response": "Valkyrae is an American livestreamer and
+YouTuber. She is one of the most-watched female gaming creators and is known for her 'AmongUs' gameplay, vlogs, and collaborations with other popular streamers." }, { "keywords":
+["elrubiusOMG", "El Rubius", "gaming", "vlogs", "Spanish YouTuber"], "response": "elrubiusOMG
+is the channel of Rubén Doblas Gundersen, a Spanish-Norwegian YouTuber. He is one of the
+most-subscribed creators in Spain, known for his gaming commentary, comedy videos, and
+satirical vlogs." },
+  {
+"keywords": ["Elon Musk", "Tesla", "SpaceX", "Neuralink", "X",
+"The Boring Company", "founder", "CEO", "engineer"],
+"response": "Elon Musk is a business magnate and engineer. He is
+the founder, CEO, and chief engineer of SpaceX; CEO and product
+architect of Tesla, Inc.; and founder of The Boring Company and
+Neuralink. He is also the owner of the social media platform X
+(formerly Twitter)."
+},
+{
+"keywords": ["Jeff Bezos", "Amazon", "Blue Origin", "e-commerce",
+"aerospace", "founder"],
+"response": "Jeff Bezos is an American entrepreneur and media
+proprietor. He is the founder, executive chairman, and former
+president and CEO of Amazon. He is also the founder of the aerospace
+manufacturer and sub-orbital spaceflight services company Blue
+Origin."
+},
+{
+"keywords": ["Bill Gates", "Microsoft", "Gates Foundation",
+"co-founder", "philanthropist", "software"],
+"response": "Bill Gates is an American business magnate, software
+developer, and philanthropist. He is a co-founder of Microsoft, which
+he built into the world's largest PC software company. He and his
+wife, Melinda French Gates, co-founded the Bill & Melinda Gates
+Foundation."
+},
+{
+"keywords": ["Mark Zuckerberg", "Meta", "Facebook", "co-founder",
+"CEO", "social media"],
+"response": "Mark Zuckerberg is an American business magnate and
+software engineer. He is the co-founder, chairman, and CEO of Meta
+Platforms (formerly Facebook, Inc.), and is widely recognized for his
+role in creating Facebook, a global social networking service."
+},
+{
+"keywords": ["Larry Page", "Sergey Brin", "Google", "Alphabet",
+"co-founders"],
+"response": "Larry Page and Sergey Brin are American computer
+scientists and internet entrepreneurs who co-founded Google. They are
+also co-founders of Alphabet Inc., Google's parent company, where Page
+served as CEO and Brin as president until 2019."
+},
+{
+"keywords": ["Satya Nadella", "Microsoft", "CEO", "cloud
+computing", "Azure"],
+"response": "Satya Nadella is an Indian-American businessexecutive. He is the chairman and CEO of Microsoft. Under his
+leadership, the company has shifted its focus to cloud computing, with
+its Azure platform becoming a major competitor to Amazon Web
+Services."
+},
+{
+"keywords": ["Tim Cook", "Apple", "CEO", "operations",
+"technology"],
+"response": "Tim Cook is an American business executive who has
+been the CEO of Apple since 2011. He previously served as the
+company's chief operating officer and is credited with streamlining
+Apple's supply chain and operations."
+},
+{
+"keywords": ["Sundar Pichai", "Google", "Alphabet", "CEO",
+"software"],
+"response": "Sundar Pichai is an Indian-American business
+executive. He is the CEO of Alphabet Inc. and its subsidiary Google.
+He is a key figure in the development of Google products, including
+Chrome, Android, and Google Search."
+},
+{
+"keywords": ["Jensen Huang", "NVIDIA", "CEO", "co-founder",
+"graphics processing", "semiconductors"],
+"response": "Jensen Huang is a Taiwanese-American business
+executive and electrical engineer. He is the co-founder, president,
+and CEO of NVIDIA, a company that designs graphics processing units
+(GPUs) for the gaming and professional markets, as well as chipsets
+for mobile computing and automotive markets."
+},
+{
+"keywords": ["Andy Jassy", "Amazon", "CEO", "AWS", "cloud
+computing"],
+"response": "Andy Jassy is an American business executive. He is
+the president and CEO of Amazon. He previously led Amazon Web Services
+(AWS) from its inception, building it into the world's leading cloud
+computing platform."
+},
+{
+"keywords": ["Reed Hastings", "Netflix", "co-founder", "CEO",
+"streaming", "entertainment"],
+"response": "Reed Hastings is an American businessman and
+co-founder of Netflix. He served as the company's chairman and CEO for
+many years, overseeing its transformation from a DVD-by-mail service
+to a global streaming and content production powerhouse."
+},
+{
+"keywords": ["Marc Benioff", "Salesforce", "CEO", "cloudcomputing", "CRM"],
+"response": "Marc Benioff is an American internet entrepreneur and
+businessman. He is the co-founder, chairman, and CEO of Salesforce, a
+leading cloud-based software company specializing in customer
+relationship management (CRM)."
+},
+{
+"keywords": ["Jack Dorsey", "Twitter", "Square", "Block",
+"co-founder", "payments"],
+"response": "Jack Dorsey is an American internet entrepreneur and
+philanthropist. He is the co-founder and former CEO of Twitter and the
+co-founder and CEO of Block, Inc. (formerly Square, Inc.), a financial
+services and digital payments company."
+},
+{
+"keywords": ["Evan Spiegel", "Snapchat", "Snap Inc.",
+"co-founder", "CEO"],
+"response": "Evan Spiegel is a French-American businessman. He is
+the co-founder and CEO of Snap Inc., the company that developed the
+popular social media application Snapchat. He is known for pioneering
+the concept of disappearing messages."
+},
+{
+"keywords": ["Brian Chesky", "Airbnb", "CEO", "co-founder",
+"travel", "hospitality"],
+"response": "Brian Chesky is an American businessman and
+industrial designer. He is the co-founder and CEO of Airbnb, a popular
+online marketplace for lodging and tourism activities."
+},
+{
+"keywords": ["Travis Kalanick", "Uber", "co-founder",
+"technology", "ride-sharing"],
+"response": "Travis Kalanick is an American entrepreneur. He is
+the co-founder and former CEO of Uber, a ride-sharing and food
+delivery company. He is widely credited with building Uber into a
+global transportation giant."
+},
+{
+"keywords": ["Dara Khosrowshahi", "Uber", "CEO", "travel",
+"Expedia"],
+"response": "Dara Khosrowshahi is an Iranian-American businessman.
+He is the CEO of Uber, having taken over from co-founder Travis
+Kalanick. He previously served as the CEO of Expedia Group."
+},
+{
+"keywords": ["Daniel Ek", "Spotify", "CEO", "co-founder", "music
+streaming"],
+"response": "Daniel Ek is a Swedish billionaire entrepreneur. Heis the co-founder and CEO of the music streaming service Spotify,
+which he has grown into one of the largest music services in the
+world."
+},
+{
+"keywords": ["Jan Koum", "WhatsApp", "co-founder", "messaging",
+"Facebook"],
+"response": "Jan Koum is a Ukrainian-American billionaire
+entrepreneur. He is the co-founder of WhatsApp, a mobile messaging
+application that was acquired by Facebook in 2014 for over $19
+billion."
+},
+{
+"keywords": ["Kevin Systrom", "Instagram", "co-founder", "social
+media", "photo sharing"],
+"response": "Kevin Systrom is an American entrepreneur and
+software engineer. He is the co-founder of Instagram, a mobile photo
+and video sharing social networking service that was acquired by
+Facebook in 2012."
+},
+{
+"keywords": ["Steve Wozniak", "Apple", "co-founder", "engineer",
+"personal computer"],
+"response": "Steve Wozniak is an American electronics engineer and
+computer scientist. He is a co-founder of Apple, alongside Steve Jobs,
+and is widely credited as the inventor of the Apple I and Apple II
+computers, which helped launch the personal computer revolution."
+},
+{
+"keywords": ["Michael Dell", "Dell Technologies", "founder",
+"CEO", "computers"],
+"response": "Michael Dell is an American billionaire businessman
+and entrepreneur. He is the founder, chairman, and CEO of Dell
+Technologies, one of the world's largest technology infrastructure
+companies."
+},
+{
+"keywords": ["Eric Schmidt", "Google", "former CEO", "Alphabet",
+"software"],
+"response": "Eric Schmidt is an American businessman and software
+engineer. He served as the CEO of Google from 2001 to 2011 and as its
+executive chairman from 2011 to 2015. He played a crucial role in the
+company's growth and expansion."
+},
+{
+"keywords": ["Sheryl Sandberg", "Meta", "COO", "Facebook", "Lean
+In"],
+"response": "Sheryl Sandberg is an American business executive andphilanthropist. She served as the chief operating officer (COO) of
+Meta Platforms (formerly Facebook) for 14 years. She is also the
+author of the book 'Lean In.'"
+},
+{
+"keywords": ["Susan Wojcicki", "YouTube", "former CEO", "Google",
+"technology"],
+"response": "Susan Wojcicki is a Polish-American technology
+executive. She was the CEO of YouTube for nine years, overseeing its
+growth into the world's dominant video platform. She was also one of
+the earliest employees at Google."
+},
+{
+"keywords": ["Geoffrey Hinton", "AI", "deep learning", "Godfather
+of AI"],
+"response": "Geoffrey Hinton is a British-Canadian cognitive
+psychologist and computer scientist. He is a leading figure in the
+field of deep learning and is often referred to as one of the
+'Godfathers of AI' for his foundational work on neural networks."
+},
+{
+"keywords": ["Yann LeCun", "Meta AI", "AI researcher", "deep
+learning"],
+"response": "Yann LeCun is a French computer scientist and AI
+researcher. He is the Chief AI Scientist at Meta and a professor at
+New York University. He is a key figure in deep learning and is known
+for his work on convolutional neural networks."
+},
+{
+"keywords": ["Demis Hassabis", "DeepMind", "Google AI", "CEO", "AI
+research"],
+"response": "Demis Hassabis is a British artificial intelligence
+researcher and neuroscientist. He is the co-founder and CEO of
+DeepMind, an AI company that was acquired by Google. He is known for
+leading research that has resulted in breakthroughs like AlphaGo."
+},
+{
+"keywords": ["Sam Altman", "OpenAI", "CEO", "AI research",
+"ChatGPT"],
+"response": "Sam Altman is an American entrepreneur and investor.
+He is the CEO of OpenAI, a research company focused on developing safe
+and beneficial artificial intelligence. He is a key figure in the
+development of advanced AI models like GPT-4."
+},
+{
+"keywords": ["Ilya Sutskever", "OpenAI", "co-founder", "AI
+research"],
+"response": "Ilya Sutskever is a Russian-Canadian computerscientist. He is a co-founder and former chief scientist of OpenAI. He
+is a prominent researcher in the field of deep learning and is known
+for his work with neural networks."
+}
+        ];
+
+        // Default response
+        const defaultResponse = "I'm sorry, I don't have information about that specific question. " +
+                               "I can help with questions about our:<br><br>" +
+                               "• AI chatbot services<br>" +
+                               "• Pricing and packages<br>" +
+                               "• Implementation process<br>" +
+                               "• Technology stack<br><br>" +
+                               "Could you ask about one of these topics or try rephrasing your question?";
+
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const suggestedQuestions = document.querySelectorAll('.suggested-question');
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender + '-message');
+            
+            // Check if the text contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(text)) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Get bot response
+        function getBotResponse(question) {
+            const lowerQuestion = question.toLowerCase().trim();
+            
+            // Check for matches in knowledge base
+            for (const item of knowledgeBase) {
+                if (item.keywords.some(keyword => lowerQuestion.includes(keyword))) {
+                    return item.response;
+                }
+            }
+            
+            // Default response
+            return defaultResponse;
+        }
+
+        // Handle send message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+            
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('message', 'bot-message');
+            typingIndicator.textContent = '...';
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Simulate thinking delay
+            setTimeout(() => {
+                chatMessages.removeChild(typingIndicator);
+                const response = getBotResponse(message);
+                addMessage(response, 'bot');
+            }, 800 + Math.random() * 800);
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Suggested questions
+        suggestedQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                userInput.value = question.textContent;
+                sendMessage();
+            });
+        });
+
+        // Focus input on page load
+        window.addEventListener('load', () => {
+            userInput.focus();
+        });
+    </script>
+</body>
+</html>
