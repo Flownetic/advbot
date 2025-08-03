@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Alphabetical Chatbot - Flovvnetic.io</title>
+    <title>Bi-Alphabetical Chatbot - Flovvnetic.io</title>
     <style>
         /* Global Styles */
         * {
@@ -115,6 +115,12 @@
             margin-bottom: 8px;
         }
         
+        .search-path {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
         .loading {
             color: #888;
             font-style: italic;
@@ -183,39 +189,31 @@
 </head>
 <body>
     <nav>
-        <a href="#" class="logo">Advanced Alphabetical Search</a>
+        <a href="#" class="logo">Bi-Alphabetical Search</a>
     </nav>
 
     <div class="chatbot-container">
         <div class="chatbot-header">
-            <h2>Nested Alphabetical Knowledge Base</h2>
-            <p>Enter a sentence to search through our A-Z knowledge hierarchy</p>
+            <h2>Dual-Letter Search System</h2>
+            <p>Words are searched based on their first two letters (e.g., "apple" → a/p.json)</p>
         </div>
         
         <div id="chat-container"></div>
         
         <div class="chat-input-container">
-            <input type="text" id="user-input" placeholder="Type a sentence (e.g., 'apple banana cherry')..." autofocus>
+            <input type="text" id="user-input" placeholder="Type a word (e.g., 'apple', 'banana')..." autofocus>
             <button id="send-btn">Search</button>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2023 Flovvnetic.io Advanced Search. All rights reserved.</p>
+        <p>&copy; 2023 Flovvnetic.io Dual-Letter Search. All rights reserved.</p>
     </footer>
 
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-
-        // Words to ignore (question words and single characters)
-        const IGNORE_WORDS = new Set([
-            'what', 'where', 'when', 'why', 'how', 'who', 'whom', 'whose', 'which',
-            'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could', 'will',
-            'would', 'should', 'may', 'might', 'must', 'a', 'an', 'the', 'and', 'or',
-            'but', 'of', 'to', 'in', 'on', 'at', 'for', 'with', 'as', 'by', 'from'
-        ]);
 
         // Cache for loaded data files
         const dataCache = {};
@@ -234,24 +232,31 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function createResultBox(title, content) {
+        function createResultBox(term, definition, path) {
             const box = document.createElement('div');
             box.className = 'result-box';
             
             const titleElement = document.createElement('div');
             titleElement.className = 'result-title';
-            titleElement.textContent = title;
+            titleElement.textContent = term.charAt(0).toUpperCase() + term.slice(1);
+            
+            const pathElement = document.createElement('div');
+            pathElement.className = 'search-path';
+            pathElement.textContent = `Searched path: ${path}`;
             
             const contentElement = document.createElement('div');
-            contentElement.innerHTML = content;
+            contentElement.innerHTML = definition;
             
             box.appendChild(titleElement);
             box.appendChild(contentElement);
+            box.appendChild(pathElement);
             
             return box;
         }
 
-        async function loadNestedData(path) {
+        async function loadDataFile(firstLetter, secondLetter) {
+            const path = `${firstLetter}/${secondLetter}`;
+            
             // Check cache first
             if (dataCache[path]) {
                 return dataCache[path];
@@ -270,39 +275,61 @@
             }
         }
 
-        function processInput(text) {
-            // Convert to lowercase and remove punctuation
-            const cleanText = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, '');
+        function processWord(word) {
+            // Clean the word: lowercase and remove non-alphabetic characters
+            const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
             
-            // Split into words and filter out ignored words and single characters
-            return cleanText.split(/\s+/)
-                .filter(word => word.length > 1 && !IGNORE_WORDS.has(word));
+            // Need at least 2 characters to determine the path
+            if (cleanWord.length < 2) {
+                return null;
+            }
+            
+            return {
+                firstLetter: cleanWord[0],
+                secondLetter: cleanWord[1],
+                original: word.toLowerCase()
+            };
         }
 
-        async function searchForTerm(pathParts, term) {
-            const path = pathParts.join('/');
-            const data = await loadNestedData(path);
+        async function searchTerm(wordInfo) {
+            const { firstLetter, secondLetter, original } = wordInfo;
+            const path = `${firstLetter}/${secondLetter}`;
+            
+            const data = await loadDataFile(firstLetter, secondLetter);
             
             if (!data) {
-                return { found: false, message: `No data available for path: ${path}` };
+                return {
+                    found: false,
+                    message: `No data file found at path: ${path}.json`
+                };
             }
             
             // Check for exact match first
-            if (data[term]) {
-                return { found: true, result: data[term] };
+            if (data[original]) {
+                return {
+                    found: true,
+                    term: original,
+                    definition: data[original],
+                    path: path
+                };
             }
             
-            // Check for partial matches
+            // Check for partial matches (words that start with these letters)
             for (const [key, value] of Object.entries(data)) {
-                if (term.includes(key) {
-                    return { found: true, result: value };
-                }
-                if (key.includes(term)) {
-                    return { found: true, result: value };
+                if (key.startsWith(original)) {
+                    return {
+                        found: true,
+                        term: key,
+                        definition: value,
+                        path: path
+                    };
                 }
             }
             
-            return { found: false, message: `No definition found for "${term}" in ${path}` };
+            return {
+                found: false,
+                message: `No definition found for "${original}" in ${path}.json`
+            };
         }
 
         async function handleUserInput() {
@@ -319,53 +346,34 @@
             chatContainer.appendChild(loadingMsg);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             
-            // Process the input
-            const searchTerms = processInput(query);
+            // Process the word
+            const wordInfo = processWord(query.split(/\s+/)[0]); // Take first word only
             
-            if (searchTerms.length === 0) {
+            if (!wordInfo) {
                 chatContainer.removeChild(loadingMsg);
-                addMessage('bot', "Please enter meaningful words to search (avoid question words and single letters).");
+                addMessage('bot', "Please enter a word with at least 2 alphabetic characters.");
                 return;
             }
             
-            // Build the path from the first letters of each term
-            const pathParts = [];
-            const results = [];
-            
-            for (const term of searchTerms) {
-                const firstLetter = term[0].toLowerCase();
-                if (!/[a-z]/.test(firstLetter)) continue;
-                
-                pathParts.push(firstLetter);
-                const searchResult = await searchForTerm(pathParts, term);
-                
-                if (searchResult.found) {
-                    results.push({
-                        term: term,
-                        definition: searchResult.result
-                    });
-                }
-            }
+            // Search for the term
+            const searchResult = await searchTerm(wordInfo);
             
             // Remove loading indicator
             chatContainer.removeChild(loadingMsg);
             
-            if (results.length === 0) {
-                addMessage('bot', "No definitions found for any of the search terms. Try different words.");
+            if (!searchResult.found) {
+                addMessage('bot', searchResult.message);
                 return;
             }
             
-            // Display results
-            addMessage('bot', `Found ${results.length} definition(s):`);
-            
-            for (const result of results) {
-                const resultBox = createResultBox(
-                    result.term.charAt(0).toUpperCase() + result.term.slice(1),
-                    result.definition
-                );
-                chatContainer.appendChild(resultBox);
-            }
-            
+            // Display result
+            addMessage('bot', `Found definition for "${searchResult.term}":`);
+            const resultBox = createResultBox(
+                searchResult.term,
+                searchResult.definition,
+                searchResult.path
+            );
+            chatContainer.appendChild(resultBox);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
@@ -376,8 +384,10 @@
         });
 
         // Initial message
-        addMessage('bot', "Welcome to the Advanced Alphabetical Search! Enter a sentence and I'll search for each meaningful word in our nested A-Z knowledge base.");
-        addMessage('bot', "Example: Try 'apple banana fruit' to search a/apple.json, then a/b/banana.json, then f/fruit.json");
+        addMessage('bot', "Welcome to the Dual-Letter Search System!");
+        addMessage('bot', "Enter a word and I'll search based on its first two letters.");
+        addMessage('bot', "Example: 'apple' → searches data/a/p.json");
+        addMessage('bot', "Example: 'banana' → searches data/b/a.json");
     </script>
 </body>
 </html>
