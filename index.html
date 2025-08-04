@@ -12,6 +12,18 @@
       margin: 0;
       padding: 0;
     }
+    .loading-screen {
+      position: fixed;
+      background-color: #000;
+      color: #00ff88;
+      font-size: 1.5rem;
+      font-weight: bold;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
     .chatbot-container {
       max-width: 800px;
       margin: 3rem auto;
@@ -19,6 +31,7 @@
       border-radius: 8px;
       padding: 1rem;
       box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+      display: none;
     }
     .chat-header {
       text-align: center;
@@ -38,20 +51,23 @@
       display: flex;
       flex-direction: column;
     }
-    .user-msg, .bot-msg {
+    .user-msg, .bot-msg-group {
       margin: 0.5rem 0;
-      padding: 0.7rem;
-      border-radius: 8px;
       max-width: 75%;
+      border-radius: 8px;
+      padding: 0.7rem;
     }
     .user-msg {
       background-color: #004d26;
       align-self: flex-end;
       margin-left: auto;
     }
-    .bot-msg {
+    .bot-msg-group {
       background-color: #262626;
       align-self: flex-start;
+    }
+    .bot-msg-group p {
+      margin: 0.3rem 0;
     }
     .input-container {
       display: flex;
@@ -95,10 +111,12 @@
   </style>
 </head>
 <body>
-  <div class="chatbot-container">
+  <div class="loading-screen" id="loading-screen">Loading Daisuke...</div>
+
+  <div class="chatbot-container" id="chatbot-container">
     <div class="chat-header">Daisuke AI Assistant</div>
     <div class="chat-box" id="chat-box">
-      <div class="bot-msg">Hi! I'm Daisuke v1.2. Ask me anything.</div>
+      <div class="bot-msg-group"><p>Hi! I'm Daisuke v1.2. Ask me anything.</p></div>
     </div>
     <div class="input-container">
       <input type="text" id="user-input" placeholder="Type your question...">
@@ -111,17 +129,17 @@
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
+    const loadingScreen = document.getElementById('loading-screen');
+    const chatbotContainer = document.getElementById('chatbot-container');
 
     const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
     const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
     const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
+    let basicData = {};
+
     function cleanText(text) {
-      return text
-        .toLowerCase()
-        .replace(/[^\w\s_]/g, '')
-        .split(/\s+/)
-        .filter(Boolean);
+      return text.toLowerCase().replace(/[^\w\s_]/g, '').split(/\s+/).filter(Boolean);
     }
 
     function removeQWords(text) {
@@ -154,16 +172,25 @@
 
     function addMessage(text, type) {
       const msg = document.createElement('div');
-      msg.className = type === 'user' ? 'user-msg' : 'bot-msg';
-      msg.textContent = text;
+      msg.className = type === 'user' ? 'user-msg' : 'bot-msg-group';
+      if (Array.isArray(text)) {
+        text.forEach(t => {
+          const p = document.createElement('p');
+          p.textContent = t;
+          msg.appendChild(p);
+        });
+      } else {
+        const p = document.createElement('p');
+        p.textContent = text;
+        msg.appendChild(p);
+      }
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
-      return msg;
     }
 
     function addTypingIndicator() {
       const msg = document.createElement('div');
-      msg.className = 'bot-msg';
+      msg.className = 'bot-msg-group';
       msg.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -171,19 +198,18 @@
     }
 
     async function searchAnswer(query) {
-      // Step 1: Search in basic/basic.json (original input only)
-      let file = await fetchJSON('basic/basic.json');
-      if (file) {
-        if (file[query]) return [file[query]];
+      const foundAnswers = [];
 
-        for (let key in file) {
+      const basic = await fetchJSON('basic/basic.json');
+      if (basic) {
+        if (basic[query]) return [basic[query]];
+        for (let key in basic) {
           if (similarity(key, query) > 90) {
-            return [file[key]];
+            return [basic[key]];
           }
         }
       }
 
-      // Step 2: Search using cleaned keywords
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
       const keywords = wordsArray.filter(w =>
@@ -192,26 +218,13 @@
         !questionWords.includes(w)
       );
 
-      if (keywords.length === 0) {
-        return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
-      }
+      if (keywords.length === 0) return ["Your question does not make sense."];
 
-      const foundAnswers = [];
-
-      file = await fetchJSON(`custom/${keywords[0][0]}.json`);
+      let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
           if (similarity(key.replace(/_/g, ' '), clean) > 85) {
             foundAnswers.push(file[key]);
-            break;
-          }
-        }
-        if (foundAnswers.length === 0) {
-          for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 65) {
-              foundAnswers.push(file[key]);
-              break;
-            }
           }
         }
       }
@@ -222,15 +235,6 @@
           for (let key in file) {
             if (similarity(key.replace(/_/g, ' '), clean) > 85) {
               foundAnswers.push(file[key]);
-              break;
-            }
-          }
-          if (foundAnswers.length === 0) {
-            for (let key in file) {
-              if (similarity(key.replace(/_/g, ' '), clean) > 65) {
-                foundAnswers.push(file[key]);
-                break;
-              }
             }
           }
         }
@@ -242,21 +246,10 @@
           const b = word[1] || 'a';
           file = await fetchJSON(`data/${a}/${b}.json`);
           if (file) {
-            let matched = false;
             for (let key in file) {
-              if (similarity(key, word) > 90) {
+              const sim = similarity(key, word);
+              if (sim > 90 || (sim > 50 && key.includes('_'))) {
                 foundAnswers.push(file[key]);
-                matched = true;
-                break;
-              }
-            }
-            if (!matched) {
-              for (let key in file) {
-                const sim = similarity(key, word);
-                if (sim > 40 && sim < 80 && key.includes('_')) {
-                  foundAnswers.push(file[key]);
-                  break;
-                }
               }
             }
           }
@@ -272,22 +265,29 @@
 
       addMessage(input, 'user');
       userInput.value = '';
-
       const typingMsg = addTypingIndicator();
 
       const replies = await searchAnswer(input);
       typingMsg.remove();
 
       if (Array.isArray(replies) && replies.length > 0) {
-        replies.forEach(reply => addMessage(reply, 'bot'));
+        addMessage(replies, 'bot');
       } else {
-        addMessage("Daisuke: Sorry, I don't know that.", 'bot');
+        addMessage(["Sorry, I don't know that."], 'bot');
       }
     }
 
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', e => {
       if (e.key === 'Enter') handleSend();
+    });
+
+    // On page load: wait for basic.json, then show UI
+    window.addEventListener('DOMContentLoaded', async () => {
+      const basic = await fetchJSON('basic/basic.json');
+      if (basic) basicData = basic;
+      loadingScreen.style.display = 'none';
+      chatbotContainer.style.display = 'block';
     });
   </script>
 </body>
