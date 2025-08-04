@@ -119,26 +119,24 @@
     function cleanText(text) {
       return text
         .toLowerCase()
-        .replace(/[^\w\s_]/g, '') // Remove all symbols except underscore
+        .replace(/[^\w\s_]/g, '') // remove symbols except _
         .split(/\s+/)
         .filter(Boolean);
     }
 
     function removeQWords(text) {
-      const words = cleanText(text);
-      return words
-        .filter(word =>
-          !questionWords.includes(word) &&
-          !pronouns.includes(word) &&
-          !helpingVerbs.includes(word)
-        ).join(' ');
+      let words = cleanText(text);
+      while (words.length && (questionWords.includes(words[0]) || helpingVerbs.includes(words[0]) || pronouns.includes(words[0]))) {
+        words.shift();
+      }
+      return words.join(' ');
     }
 
     function similarity(a, b) {
       let matches = 0;
+      const len = Math.max(a.length, b.length);
       a = a.toLowerCase();
       b = b.toLowerCase();
-      const len = Math.max(a.length, b.length);
       for (let i = 0; i < len; i++) {
         if (a[i] === b[i]) matches++;
       }
@@ -172,6 +170,17 @@
     }
 
     async function searchAnswer(query) {
+      // Step 1: Check in basic.json
+      const basic = await fetchJSON('basic.json');
+      if (basic) {
+        for (let key in basic) {
+          if (similarity(key, query) > 90) {
+            return [basic[key]];
+          }
+        }
+      }
+
+      // Step 2: Cleaned input
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
       const keywords = wordsArray.filter(w => !pronouns.includes(w) && !helpingVerbs.includes(w) && !questionWords.includes(w));
@@ -182,7 +191,7 @@
 
       const foundAnswers = [];
 
-      // --- Search in custom folder
+      // Step 3: custom/
       let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
@@ -201,7 +210,7 @@
         }
       }
 
-      // --- Search in commen folder
+      // Step 4: commen/
       if (foundAnswers.length === 0) {
         file = await fetchJSON(`commen/${keywords[0][0]}.json`);
         if (file) {
@@ -222,7 +231,7 @@
         }
       }
 
-      // --- Search in data/ folder
+      // Step 5: data/
       if (foundAnswers.length === 0) {
         for (let word of keywords) {
           const a = word[0];
