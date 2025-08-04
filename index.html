@@ -117,11 +117,7 @@
     const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
     function cleanText(text) {
-      return text
-        .toLowerCase()
-        .replace(/[^\w\s_]/g, '') // remove symbols except _
-        .split(/\s+/)
-        .filter(Boolean);
+      return text.toLowerCase().replace(/[^\w\s_]/g, '').split(/\s+/).filter(Boolean);
     }
 
     function removeQWords(text) {
@@ -170,17 +166,15 @@
     }
 
     async function searchAnswer(query) {
-      // Step 1: Check in basic.json
-      const basic = await fetchJSON('basic.json');
+      // Step 1: Search in basic/basic.json with original case
+      const basic = await fetchJSON('basic/basic.json');
       if (basic) {
         for (let key in basic) {
-          if (similarity(key, query) > 90) {
-            return [basic[key]];
-          }
+          if (similarity(key, query) > 90) return [basic[key]];
         }
       }
 
-      // Step 2: Cleaned input
+      // Step 2: Clean input
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
       const keywords = wordsArray.filter(w => !pronouns.includes(w) && !helpingVerbs.includes(w) && !questionWords.includes(w));
