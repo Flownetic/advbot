@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flovvnetic.io - AI Chatbot</title>
     <style>
-        /* Global Styles - Matching Flovvnetic.io Theme */
+        /* Global Styles */
         * {
             margin: 0;
             padding: 0;
@@ -19,7 +19,7 @@
             line-height: 1.6;
         }
         
-        /* Navigation - Matching Parent Site */
+        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
@@ -55,148 +55,145 @@
             color: #00ff88;
         }
         
-        /* Chat Container - Customized to Match Theme */
+        /* Chat Container */
         .chat-container {
-            width: 100%;
-            max-width: 1200px;
+            max-width: 900px;
             margin: 2rem auto;
+            padding: 2rem;
             background-color: #1e1e1e;
-            border-radius: 10px;
-            overflow: hidden;
+            border-radius: 8px;
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-            border: 1px solid #333333;
+            border-left: 4px solid #00ff88;
         }
         
         .chat-header {
-            background-color: #000000;
-            color: white;
-            padding: 1.5rem;
             text-align: center;
-            border-bottom: 2px solid #00ff88;
+            margin-bottom: 2rem;
         }
         
         .chat-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
             color: #00ff88;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
             text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+        
+        .chat-header p {
+            color: #b0b0b0;
         }
         
         .chat-messages {
             height: 500px;
-            padding: 1.5rem;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: #121212;
+            border-radius: 5px;
+            border: 1px solid #333;
         }
         
         .message {
-            max-width: 80%;
-            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem 1.2rem;
             border-radius: 18px;
-            line-height: 1.5;
+            max-width: 75%;
             position: relative;
-            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .user-message {
-            background-color: #005a3c;
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #00cc6a, #00ff88);
+            color: #121212;
             margin-left: auto;
             border-bottom-right-radius: 5px;
-            border: 1px solid #00aa6c;
         }
         
         .bot-message {
-            background-color: #252525;
+            background-color: #2a2a2a;
             color: #e0e0e0;
             margin-right: auto;
             border-bottom-left-radius: 5px;
-            border: 1px solid #333333;
+            border-left: 3px solid #00ff88;
         }
         
-        .chat-input-container {
+        .typing-indicator {
+            color: #00ff88;
+            font-style: italic;
+            margin: 0.5rem 0;
             display: flex;
-            padding: 1rem;
-            background-color: #1a1a1a;
-            border-top: 1px solid #333333;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.3rem;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 1rem;
         }
         
         #user-input {
             flex: 1;
             padding: 1rem;
-            background-color: #252525;
-            border: 1px solid #333333;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
             border-radius: 5px;
             color: #e0e0e0;
             font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
+            transition: border 0.3s;
         }
         
         #user-input:focus {
+            outline: none;
             border-color: #00ff88;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
         }
         
         #send-button {
+            padding: 0 2rem;
             background-color: #00ff88;
             color: #121212;
             border: none;
-            padding: 0 1.5rem;
-            margin-left: 1rem;
             border-radius: 5px;
-            cursor: pointer;
             font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
             transition: all 0.3s;
         }
         
         #send-button:hover {
             background-color: #00cc6a;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
         }
         
-        /* Typing indicator */
-        .typing-indicator {
-            display: none;
-            margin-right: auto;
-            padding: 1rem 1.5rem;
-            background-color: #252525;
-            border-radius: 18px;
-            border-bottom-left-radius: 5px;
-            border: 1px solid #333333;
-            width: fit-content;
-        }
-        
-        .typing-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #00ff88;
-            margin-right: 4px;
-            animation: typingAnimation 1.4s infinite ease-in-out;
-        }
-        
-        .typing-dot:nth-child(1) {
-            animation-delay: 0s;
-        }
-        
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-            margin-right: 0;
-        }
-        
-        @keyframes typingAnimation {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-        
-        /* Footer - Matching Parent Site */
+        /* Footer */
         footer {
             text-align: center;
             padding: 2rem;
@@ -222,24 +219,27 @@
             color: #00ff88;
         }
         
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
             .chat-container {
-                margin: 0;
-                border-radius: 0;
-                height: 100vh;
+                margin: 1rem;
+                padding: 1rem;
             }
             
             .chat-messages {
-                height: calc(100vh - 180px);
+                height: 400px;
             }
             
             .message {
-                max-width: 90%;
+                max-width: 85%;
+            }
+            
+            .input-area {
+                flex-direction: column;
+            }
+            
+            #send-button {
+                padding: 1rem;
             }
         }
     </style>
@@ -258,18 +258,23 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h1>Flovvnetic AI Assistant</h1>
+            <h1>Flovvnetic AI Chatbot</h1>
+            <p>Ask me anything about our services or AI technology</p>
         </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="message bot-message">Hello! I'm your Flovvnetic AI assistant. How can I help you today?</div>
+        
+        <div class="chat-messages" id="chat-messages"></div>
+        
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span>Flovvnetic AI is typing...</span>
         </div>
-        <div class="typing-indicator" id="typing-indicator">
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-        </div>
-        <div class="chat-input-container">
-            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+        
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your question here..." autocomplete="off">
             <button id="send-button">Send</button>
         </div>
     </div>
@@ -285,247 +290,172 @@
     </footer>
 
     <script>
-        // Knowledge base - would normally be in separate JSON files
-        const knowledgeBase = {
-            // Basic responses
-            basic: {
-                "hello": "Hello there! Welcome to Flovvnetic.io. How can I assist you with our AI or web services today?",
-                "hi": "Hi! I'm the Flovvnetic AI assistant. What can I help you with?",
-                "good morning": "Good morning! Ready to explore how AI can transform your business?",
-                "good afternoon": "Good afternoon! How can I assist you with Flovvnetic's services?",
-                "good evening": "Good evening! What AI solutions can I tell you about?",
-                "bye": "Goodbye! Feel free to return if you have more questions about Flovvnetic.io!",
-                "thanks": "You're welcome! Let me know if you need anything else about our AI or web services."
-            },
-            
-            // Custom responses by first letter
-            custom: {
-                a: {
-                    "ai": "At Flovvnetic.io, we specialize in custom AI solutions including chatbots, predictive analytics, and process automation tailored to your business needs.",
-                    "about": "Flovvnetic.io provides cutting-edge AI chatbot solutions and web development services to help businesses automate and grow."
-                },
-                b: {
-                    "bot": "Our AI chatbots can handle customer service, lead generation, and more, available 24/7 with natural language understanding.",
-                    "business": "We help businesses of all sizes implement AI solutions to reduce costs, improve efficiency, and enhance customer experiences."
-                },
-                c: {
-                    "chatbot": "Our chatbots use natural language processing to understand and respond to customer inquiries in real-time, learning from each interaction.",
-                    "cost": "Pricing depends on your specific needs. We offer scalable solutions for businesses of all sizes. Would you like a consultation?"
-                },
-                w: {
-                    "website": "We create stunning, high-performance websites designed to convert visitors into customers with optimized UX/UI.",
-                    "web development": "Our web development services include custom design, e-commerce solutions, and seamless integration with your existing systems."
-                }
-            },
-            
-            // Common responses by first letter
-            commen: {
-                a: {
-                    "api": "We can integrate our AI solutions with your existing APIs or build custom APIs for your specific needs.",
-                    "ai pricing": "Our AI solutions are priced based on complexity and scale. Contact us for a customized quote."
-                },
-                s: {
-                    "services": "We offer: 1) Custom AI Chatbots 2) Website Development 3) AI Integration 4) Process Automation 5) Data Analytics",
-                    "support": "We provide 24/7 support for all our AI solutions and websites with guaranteed response times."
-                },
-                p: {
-                    "pricing": "Our solutions are custom-priced based on your requirements. We offer flexible pricing models to suit different business sizes.",
-                    "process": "Our process: 1) Consultation 2) Planning 3) Development 4) Testing 5) Deployment 6) Ongoing Support"
-                }
-            },
-            
-            // Detailed data responses
-            data: {
-                a: {
-                    i: {
-                        "ai implementation": "Our AI implementation process includes: 1) Needs assessment 2) Data integration 3) Model training 4) Testing 5) Deployment 6) Ongoing optimization",
-                        "ai benefits": "AI can help your business by: 1) Reducing costs 2) Improving efficiency 3) Enhancing customer experience 4) Providing data insights 5) Enabling 24/7 operations"
-                    }
-                },
-                c: {
-                    h: {
-                        "chatbot features": "Our chatbots include: 1) Natural language understanding 2) Contextual awareness 3) Multi-language support 4) Integration with CRM 5) Analytics dashboard",
-                        "chatbot pricing": "Chatbot pricing starts at $299/month for basic implementations. Enterprise solutions are custom quoted."
-                    }
-                },
-                w: {
-                    e: {
-                        "web design": "Our web design services include: 1) Custom UI/UX 2) Responsive design 3) SEO optimization 4) Performance tuning 5) Accessibility compliance",
-                        "website pricing": "Basic websites start at $1,999. E-commerce and custom web applications are priced based on requirements."
-                    }
-                }
-            }
-        };
-
-        // Question words and verbs to remove
-        const QUESTION_WORDS = ['what', 'how', 'who', 'whom', 'whose', 'which', 'where', 'when', 'why', 'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could', 'will', 'would', 'shall', 'should', 'may', 'might', 'must'];
-        const MEANING_WORDS = ['mean', 'meaning', 'tell', 'explain', 'define', 'describe'];
-
         // DOM elements
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const typingIndicator = document.getElementById('typing-indicator');
 
-        // Event listeners
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+        // Question words to ignore
+        const QUESTION_WORDS = ['what', 'how', 'who', 'where', 'when', 'why', 'is', 'are', 'do', 'does', 'tell', 'explain', 'define'];
 
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (message === '') return;
-            
-            // Add user message to chat
-            addMessage(message, 'user');
-            userInput.value = '';
-            
-            // Show typing indicator
-            typingIndicator.style.display = 'block';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Simulate processing delay
-            setTimeout(() => {
-                typingIndicator.style.display = 'none';
-                const response = processMessage(message);
-                addMessage(response, 'bot');
-            }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
-        }
-
-        function addMessage(text, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.classList.add(`${sender}-message`);
-            messageElement.textContent = text;
-            chatMessages.appendChild(messageElement);
+        // Display a message in chat
+        function displayMessage(text, isUser) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            div.textContent = text;
+            chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function processMessage(message) {
-            // Step 1: Clean and check basic.json
-            const cleanedStep1 = cleanMessageStep1(message);
-            const basicResponse = checkBasicJson(cleanedStep1);
-            if (basicResponse) return basicResponse;
-            
-            // Step 2: Process for custom JSON files
-            const processedStep2 = processMessageStep2(message);
-            if (processedStep2) {
-                const firstLetter = processedStep2.keyword.charAt(0).toLowerCase();
-                if (/[a-z]/.test(firstLetter)) {
-                    const customResponse = searchInJson('custom', firstLetter, processedStep2.words, 85) || 
-                                         searchInJson('custom', firstLetter, processedStep2.words, 60);
-                    if (customResponse) return customResponse;
-                }
-            }
-            
-            // Step 3: Process for commen JSON files
-            const processedStep3 = processMessageStep3(message);
-            if (processedStep3) {
-                const firstLetter = processedStep3.keyword.charAt(0).toLowerCase();
-                if (/[a-z]/.test(firstLetter)) {
-                    const commenResponse = searchInJson('commen', firstLetter, processedStep3.words, 85) || 
-                                         searchInJson('commen', firstLetter, processedStep3.words, 60);
-                    if (commenResponse) return commenResponse;
-                }
-            }
-            
-            // Step 4: Search in data folder
-            const keywords = processMessageStep4(message);
-            for (const keyword of keywords) {
-                if (keyword.length >= 2) {
-                    const firstLetter = keyword.charAt(0).toLowerCase();
-                    const secondLetter = keyword.charAt(1).toLowerCase();
-                    if (/[a-z]/.test(firstLetter) && /[a-z]/.test(secondLetter)) {
-                        const dataResponse = searchInDataJson(firstLetter, secondLetter, keyword);
-                        if (dataResponse) return dataResponse;
+        // Show/hide typing indicator
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Calculate similarity between strings
+        function similarity(s1, s2) {
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length <= s2.length ? s1 : s2;
+            if (longer.length === 0) return 1.0;
+            return (longer.length - editDistance(longer, shorter)) / longer.length;
+        }
+
+        // Edit distance helper
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            const costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1[i - 1] !== s2[j - 1]) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
                     }
                 }
+                if (i > 0) costs[s2.length] = lastValue;
             }
-            
-            return "I'm sorry, I don't have information about that. As a Flovvnetic AI assistant, I can answer questions about our AI chatbots, web development services, and business solutions. Could you try asking something else?";
+            return costs[s2.length];
         }
 
-        function cleanMessageStep1(message) {
-            // Remove symbols and unwanted whitespace
-            return message.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
-        }
-
-        function checkBasicJson(message) {
-            return knowledgeBase.basic[message] || null;
-        }
-
-        function processMessageStep2(message) {
-            let words = message.toLowerCase().split(/\s+/);
-            
-            // Remove question words and meaning words
-            words = words.filter(word => !QUESTION_WORDS.includes(word) && !MEANING_WORDS.includes(word));
-            
-            // Remove until first word is not a helping verb/question word
-            while (words.length > 0 && (QUESTION_WORDS.includes(words[0]) || MEANING_WORDS.includes(words[0]))) {
-                words.shift();
+        // Load JSON file
+        async function loadJSON(file) {
+            try {
+                const response = await fetch(file);
+                if (!response.ok) return {};
+                return await response.json();
+            } catch (error) {
+                console.error(`Error loading ${file}:`, error);
+                return {};
             }
-            
-            if (words.length === 0) return null;
-            
-            // Convert underscores to spaces in the first word
-            const keyword = words[0].replace(/_/g, ' ');
-            
-            return { keyword, words };
         }
 
-        function processMessageStep3(message) {
-            // Similar to step 2 but might have different processing if needed
-            return processMessageStep2(message);
-        }
+        // Find best match in JSON data
+        function findBestMatch(input, data, threshold) {
+            // Exact match first
+            if (data[input]) return data[input];
 
-        function processMessageStep4(message) {
-            let words = message.toLowerCase().split(/\s+/);
-            
-            // Remove question words, meaning words, pronouns, etc.
-            words = words.filter(word => 
-                !QUESTION_WORDS.includes(word) && 
-                !MEANING_WORDS.includes(word) &&
-                !['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'].includes(word)
-            );
-            
-            return words;
-        }
+            // Similarity match
+            if (threshold > 0) {
+                let bestMatch = null;
+                let bestScore = 0;
 
-        function searchInJson(type, letter, keywords, threshold) {
-            const data = knowledgeBase[type][letter];
-            if (!data) return null;
-            
-            for (const [key, value] of Object.entries(data)) {
-                for (const keyword of keywords) {
-                    const similarity = calculateSimilarity(key, keyword);
-                    if (similarity >= threshold / 100) {
-                        return value;
+                for (const key in data) {
+                    const score = similarity(input, key);
+                    if (score > bestScore && score >= threshold) {
+                        bestScore = score;
+                        bestMatch = data[key];
                     }
                 }
+                return bestMatch;
             }
+
             return null;
         }
 
-        function searchInDataJson(firstLetter, secondLetter, keyword) {
-            if (!knowledgeBase.data[firstLetter] || !knowledgeBase.data[firstLetter][secondLetter]) {
-                return null;
-            }
-            
-            const data = knowledgeBase.data[firstLetter][secondLetter];
-            return data[keyword] || null;
+        // Extract first keyword (ignore question words)
+        function getFirstKeyword(input) {
+            const words = input.split(' ').filter(word => 
+                !QUESTION_WORDS.includes(word.replace(/[^a-z]/g, ''))
+                .map(word => word.replace(/[^a-z]/g, ''));
+            return words[0] || null;
         }
 
-        function calculateSimilarity(str1, str2) {
-            // Simple similarity calculation
-            const set1 = new Set(str1.split(''));
-            const set2 = new Set(str2.split(''));
-            const intersection = new Set([...set1].filter(x => set2.has(x)));
-            const union = new Set([...set1, ...set2]);
-            return intersection.size / union.size;
+        // Process input through the 4 steps
+        async function findAnswer(input) {
+            input = input.toLowerCase().trim();
+            
+            // Step 1: Check basic.json (80% threshold)
+            const basicData = await loadJSON('basic.json');
+            const step1Answer = findBestMatch(input, basicData, 0.8);
+            if (step1Answer) return step1Answer;
+            
+            // Step 2: Check custom/[letter].json (85% → 60%)
+            const firstWord = getFirstKeyword(input);
+            if (firstWord) {
+                const firstLetter = firstWord[0];
+                const customData = await loadJSON(`custom/${firstLetter}.json`);
+                const customMatch = findBestMatch(firstWord, customData, 0.85) || 
+                                    findBestMatch(firstWord, customData, 0.6);
+                if (customMatch) return customMatch;
+            }
+            
+            // Step 3: Check commen/[letter].json (same thresholds)
+            if (firstWord) {
+                const commenData = await loadJSON(`commen/${firstWord[0]}.json`);
+                const commenMatch = findBestMatch(firstWord, commenData, 0.85) || 
+                                   findBestMatch(firstWord, commenData, 0.6);
+                if (commenMatch) return commenMatch;
+            }
+            
+            // Step 4: Check data/[first]/[second].json (exact match)
+            if (firstWord && firstWord.length >= 2) {
+                const firstLetter = firstWord[0];
+                const secondLetter = firstWord[1];
+                const dataFile = await loadJSON(`data/${firstLetter}/${secondLetter}.json`);
+                if (dataFile[firstWord]) return dataFile[firstWord];
+            }
+            
+            return "Sorry, I don't have an answer for that. Please contact our team for more information.";
         }
+
+        // Event listeners
+        sendButton.addEventListener('click', async () => {
+            const question = userInput.value.trim();
+            if (!question) return;
+            
+            displayMessage(question, true);
+            userInput.value = '';
+            
+            showTyping();
+            
+            // Simulate delay for realistic typing
+            setTimeout(async () => {
+                const answer = await findAnswer(question);
+                hideTyping();
+                displayMessage(answer, false);
+            }, 1000 + Math.random() * 1000);
+        });
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendButton.click();
+        });
+
+        // Initial greeting
+        setTimeout(() => {
+            displayMessage("Hello! I'm Flovvnetic's AI assistant. Ask me about our services, AI technology, or how we can help your business.", false);
+        }, 500);
     </script>
 </body>
 </html>
