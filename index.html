@@ -115,6 +115,7 @@
     const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
     const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
     const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
+    const wordsToRemove = ['tell', 'mean', 'meaning'];
 
     function cleanText(text) {
       return text
@@ -124,14 +125,31 @@
         .filter(Boolean);
     }
 
+    function removeSymbols(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, '') // Remove all symbols
+        .trim();
+    }
+
     function removeQWords(text) {
       const words = cleanText(text);
       return words
         .filter(word =>
           !questionWords.includes(word) &&
           !pronouns.includes(word) &&
-          !helpingVerbs.includes(word)
-        ).join(' ');
+          !helpingVerbs.includes(word) &&
+          !wordsToRemove.includes(word))
+        .join(' ');
+    }
+
+    function isOnlyBasicWords(text) {
+      const words = cleanText(text);
+      return words.length > 0 && 
+             words.every(word => 
+               questionWords.includes(word) || 
+               pronouns.includes(word) || 
+               helpingVerbs.includes(word));
     }
 
     function similarity(a, b) {
@@ -171,10 +189,38 @@
       return msg;
     }
 
+    async function searchBasicAnswer(query) {
+      const basicData = await fetchJSON('basic.json');
+      if (!basicData) return null;
+      
+      // Remove symbols but keep all words for basic.json search
+      const cleanQuery = removeSymbols(query).toLowerCase();
+      
+      // Check for exact match in basic.json keys
+      for (let key in basicData) {
+        const cleanKey = removeSymbols(key).toLowerCase();
+        if (cleanKey === cleanQuery) {
+          return [basicData[key]];
+        }
+      }
+      return null;
+    }
+
     async function searchAnswer(query) {
+      // First check if the query consists only of basic words
+      if (isOnlyBasicWords(query)) {
+        const basicAnswer = await searchBasicAnswer(query);
+        if (basicAnswer) return basicAnswer;
+        return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
+      }
+
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
-      const keywords = wordsArray.filter(w => !pronouns.includes(w) && !helpingVerbs.includes(w) && !questionWords.includes(w));
+      const keywords = wordsArray.filter(w => 
+        !pronouns.includes(w) && 
+        !helpingVerbs.includes(w) && 
+        !questionWords.includes(w) &&
+        !wordsToRemove.includes(w));
 
       if (keywords.length === 0) {
         return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
