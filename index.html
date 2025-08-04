@@ -18,41 +18,6 @@
             line-height: 1.6;
         }
         
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 5%;
-            background-color: #000000;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 2px solid #00ff88;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00ff88;
-            text-decoration: none;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #00ff88;
-        }
-        
         .chat-container {
             max-width: 900px;
             margin: 2rem auto;
@@ -122,10 +87,9 @@
             color: #00ff88;
             font-style: italic;
             margin: 0.5rem 0;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 0.5rem;
-            display: none;
         }
         
         .typing-dots {
@@ -141,10 +105,6 @@
             display: inline-block;
             animation: bounce 1.4s infinite ease-in-out;
         }
-        
-        .typing-dots span:nth-child(1) { animation-delay: 0s; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
         
         @keyframes bounce {
             0%, 80%, 100% { transform: translateY(0); }
@@ -190,68 +150,9 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
         }
-        
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background-color: #000000;
-            margin-top: 3rem;
-            border-top: 2px solid #00ff88;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .footer-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #00ff88;
-        }
-        
-        @media (max-width: 768px) {
-            .chat-container {
-                margin: 1rem;
-                padding: 1rem;
-            }
-            
-            .chat-messages {
-                height: 400px;
-            }
-            
-            .message {
-                max-width: 85%;
-            }
-            
-            .input-area {
-                flex-direction: column;
-            }
-            
-            #send-button {
-                padding: 1rem;
-            }
-        }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="https://flownetic.github.io/Flovvnetic/" class="logo">Flovvnetic.io</a>
-        <div class="nav-links">
-            <a href="https://flownetic.github.io/Flovvnetic/">Home</a>
-            <a href="https://flownetic.github.io/flovvnetic_services/">Services</a>
-            <a href="https://flownetic.github.io/flovvnetic_about/">About</a>
-            <a href="https://flownetic.github.io/flovvnetic_contact/">Contact</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
-        </div>
-    </nav>
-
     <div class="chat-container">
         <div class="chat-header">
             <h1>Flovvnetic AI Chatbot</h1>
@@ -275,25 +176,12 @@
         </div>
     </div>
 
-    <footer>
-        <div class="footer-links">
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Privacy Policy</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Terms of Service</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Careers</a>
-            <a href="https://flownetic.github.io/flovvnetic_soon/">Blog</a>
-        </div>
-        <p>&copy; 2023 Flovvnetic.io. All rights reserved.</p>
-    </footer>
-
     <script>
         // DOM elements
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const typingIndicator = document.getElementById('typing-indicator');
-
-        // Question words to ignore
-        const QUESTION_WORDS = ['what', 'how', 'who', 'where', 'when', 'why', 'is', 'are', 'do', 'does', 'tell', 'explain', 'define'];
 
         // Display a message in chat
         function displayMessage(text, isUser) {
@@ -314,154 +202,42 @@
             typingIndicator.style.display = 'none';
         }
 
-        // Calculate similarity between strings
-        function similarity(s1, s2) {
-            const longer = s1.length > s2.length ? s1 : s2;
-            const shorter = s1.length <= s2.length ? s1 : s2;
-            if (longer.length === 0) return 1.0;
-            return (longer.length - editDistance(longer, shorter)) / longer.length;
-        }
-
-        // Edit distance helper
-        function editDistance(s1, s2) {
-            s1 = s1.toLowerCase();
-            s2 = s2.toLowerCase();
-            const costs = [];
-            for (let i = 0; i <= s1.length; i++) {
-                let lastValue = i;
-                for (let j = 0; j <= s2.length; j++) {
-                    if (i === 0) costs[j] = j;
-                    else {
-                        if (j > 0) {
-                            let newValue = costs[j - 1];
-                            if (s1[i - 1] !== s2[j - 1]) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                            costs[j - 1] = lastValue;
-                            lastValue = newValue;
-                        }
-                    }
-                }
-                if (i > 0) costs[s2.length] = lastValue;
-            }
-            return costs[s2.length];
-        }
-
-        // Load JSON file with GitHub Pages compatible paths
-        async function loadJSON(file) {
-            try {
-                // Prepend the repository name to the path for GitHub Pages
-                const response = await fetch(`/Flovvnetic/${file}`);
-                if (!response.ok) {
-                    console.error(`Failed to load ${file}: ${response.status}`);
-                    return {};
-                }
-                return await response.json();
-            } catch (error) {
-                console.error(`Error loading ${file}:`, error);
-                return {};
-            }
-        }
-
-        // Find best match in JSON data
-        function findBestMatch(input, data, threshold) {
-            if (!data) return null;
-            
-            // Exact match first
-            if (data[input]) return data[input];
-
-            // Similarity match
-            if (threshold > 0) {
-                let bestMatch = null;
-                let bestScore = 0;
-
-                for (const key in data) {
-                    const score = similarity(input, key);
-                    if (score > bestScore && score >= threshold) {
-                        bestScore = score;
-                        bestMatch = data[key];
-                    }
-                }
-                return bestMatch;
-            }
-
-            return null;
-        }
-
-        // Extract first keyword (ignore question words)
-        function getFirstKeyword(input) {
-            const words = input.split(' ').filter(word => 
-                !QUESTION_WORDS.includes(word.replace(/[^a-z]/g, ''))
-                .map(word => word.replace(/[^a-z]/g, ''));
-            return words[0] || null;
-        }
-
-        // Process input through the 4 steps
-        async function findAnswer(input) {
-            input = input.toLowerCase().trim();
-            
-            // Step 1: Check basic.json (80% threshold)
-            const basicData = await loadJSON('basic.json');
-            const step1Answer = findBestMatch(input, basicData, 0.8);
-            if (step1Answer) return step1Answer;
-            
-            // Step 2: Check custom/[letter].json (85% → 60%)
-            const firstWord = getFirstKeyword(input);
-            if (firstWord) {
-                const firstLetter = firstWord[0];
-                const customData = await loadJSON(`custom/${firstLetter}.json`);
-                const customMatch = findBestMatch(firstWord, customData, 0.85) || 
-                                    findBestMatch(firstWord, customData, 0.6);
-                if (customMatch) return customMatch;
-            }
-            
-            // Step 3: Check commen/[letter].json (same thresholds)
-            if (firstWord) {
-                const commenData = await loadJSON(`commen/${firstWord[0]}.json`);
-                const commenMatch = findBestMatch(firstWord, commenData, 0.85) || 
-                                   findBestMatch(firstWord, commenData, 0.6);
-                if (commenMatch) return commenMatch;
-            }
-            
-            // Step 4: Check data/[first]/[second].json (exact match)
-            if (firstWord && firstWord.length >= 2) {
-                const firstLetter = firstWord[0];
-                const secondLetter = firstWord[1];
-                const dataFile = await loadJSON(`data/${firstLetter}/${secondLetter}.json`);
-                if (dataFile && dataFile[firstWord]) return dataFile[firstWord];
-            }
-            
-            return "Sorry, I don't have an answer for that. Please contact our team for more information.";
-        }
-
-        // Event listeners
-        sendButton.addEventListener('click', async () => {
+        // Event listeners - Fixed version
+        function handleSend() {
             const question = userInput.value.trim();
             if (!question) return;
             
+            // Display user message and clear input
             displayMessage(question, true);
             userInput.value = '';
             
+            // Show typing indicator
             showTyping();
             
-            setTimeout(async () => {
-                try {
-                    const answer = await findAnswer(question);
-                    hideTyping();
-                    displayMessage(answer, false);
-                } catch (error) {
-                    console.error("Error processing question:", error);
-                    hideTyping();
-                    displayMessage("An error occurred while processing your question. Please try again.", false);
-                }
-            }, 1000 + Math.random() * 1000);
-        });
-        
+            // Simulate bot response after delay
+            setTimeout(() => {
+                hideTyping();
+                const responses = [
+                    "Thanks for your question! This is a basic response.",
+                    "I'm still learning, but I'll try to help!",
+                    "That's an interesting question about our services.",
+                    "Our AI technology can help with various business needs.",
+                    "Please contact our team for more detailed information."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                displayMessage(randomResponse, false);
+            }, 1500);
+        }
+
+        // Attach event listeners
+        sendButton.addEventListener('click', handleSend);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendButton.click();
+            if (e.key === 'Enter') handleSend();
         });
 
         // Initial greeting
         setTimeout(() => {
-            displayMessage("Hello! I'm Flovvnetic's AI assistant. Ask me about our services, AI technology, or how we can help your business.", false);
+            displayMessage("Hello! I'm Flovvnetic's AI assistant. Ask me about our services or AI technology.", false);
         }, 500);
     </script>
 </body>
