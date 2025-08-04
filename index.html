@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flovvnetic.io - AI Chatbot</title>
     <style>
-        /* Global Styles */
         * {
             margin: 0;
             padding: 0;
@@ -19,7 +18,6 @@
             line-height: 1.6;
         }
         
-        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
@@ -55,7 +53,6 @@
             color: #00ff88;
         }
         
-        /* Chat Container */
         .chat-container {
             max-width: 900px;
             margin: 2rem auto;
@@ -128,6 +125,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            display: none;
         }
         
         .typing-dots {
@@ -193,7 +191,6 @@
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
         }
         
-        /* Footer */
         footer {
             text-align: center;
             padding: 2rem;
@@ -219,7 +216,6 @@
             color: #00ff88;
         }
         
-        /* Responsive */
         @media (max-width: 768px) {
             .chat-container {
                 margin: 1rem;
@@ -264,7 +260,7 @@
         
         <div class="chat-messages" id="chat-messages"></div>
         
-        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+        <div class="typing-indicator" id="typing-indicator">
             <div class="typing-dots">
                 <span></span>
                 <span></span>
@@ -440,7 +436,6 @@
             
             showTyping();
             
-            // Simulate delay for realistic typing
             setTimeout(async () => {
                 const answer = await findAnswer(question);
                 hideTyping();
