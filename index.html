@@ -1,202 +1,236 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daisuke v1.2 - AI Chatbot</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
-        }
-        .chatbot-container {
-            max-width: 800px;
-            margin: 3rem auto;
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
-        }
-        .chat-header {
-            text-align: center;
-            padding: 1rem;
-            background-color: #000;
-            color: #00ff88;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-bottom: 2px solid #00ff88;
-        }
-        .chat-box {
-            padding: 1rem;
-            height: 400px;
-            overflow-y: auto;
-            background-color: #121212;
-            margin-bottom: 1rem;
-        }
-        .user-msg, .bot-msg {
-            margin: 0.5rem 0;
-            padding: 0.7rem;
-            border-radius: 8px;
-            max-width: 75%;
-        }
-        .user-msg {
-            background-color: #004d26;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        .bot-msg {
-            background-color: #262626;
-            align-self: flex-start;
-        }
-        .input-container {
-            display: flex;
-        }
-        #user-input {
-            flex: 1;
-            padding: 0.7rem;
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            color: #e0e0e0;
-        }
-        #send-btn {
-            background-color: #00ff88;
-            border: none;
-            padding: 0.7rem 1.2rem;
-            cursor: pointer;
-            color: #000;
-            font-weight: bold;
-        }
-        footer {
-            text-align: center;
-            color: #888;
-            font-size: 0.9rem;
-            margin-top: 2rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daisuke v1.2 - AI Chatbot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+    }
+    .chatbot-container {
+      max-width: 800px;
+      margin: 3rem auto;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+    }
+    .chat-header {
+      text-align: center;
+      padding: 1rem;
+      background-color: #000;
+      color: #00ff88;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-bottom: 2px solid #00ff88;
+    }
+    .chat-box {
+      padding: 1rem;
+      height: 400px;
+      overflow-y: auto;
+      background-color: #121212;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .user-msg, .bot-msg {
+      margin: 0.5rem 0;
+      padding: 0.7rem;
+      border-radius: 8px;
+      max-width: 75%;
+    }
+    .user-msg {
+      background-color: #004d26;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .bot-msg {
+      background-color: #262626;
+      align-self: flex-start;
+    }
+    .input-container {
+      display: flex;
+    }
+    #user-input {
+      flex: 1;
+      padding: 0.7rem;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      color: #e0e0e0;
+    }
+    #send-btn {
+      background-color: #00ff88;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+    .typing-dots span {
+      display: inline-block;
+      font-size: 1.5rem;
+      animation: blink 1s infinite;
+    }
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-    <div class="chatbot-container">
-        <div class="chat-header">Daisuke AI Assistant</div>
-        <div class="chat-box" id="chat-box">
-            <div class="bot-msg">Hi! I'm Daisuke v1.2. Ask me anything.</div>
-        </div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your question...">
-            <button id="send-btn">Send</button>
-        </div>
+  <div class="chatbot-container">
+    <div class="chat-header">Daisuke AI Assistant</div>
+    <div class="chat-box" id="chat-box">
+      <div class="bot-msg">Hi! I'm Daisuke v1.2. Ask me anything.</div>
     </div>
-    <footer>&copy; 2025 Daisuke AI. All rights reserved.</footer><script>
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Type your question...">
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
+  <footer>&copy; 2025 Daisuke AI. All rights reserved.</footer>
 
-const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
-const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
-const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
-function removeQWords(text) {
-    let words = text.toLowerCase().split(/\s+/);
-    words = words.filter(word => !questionWords.includes(word));
+    const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
+    const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
+    const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
-    while (words.length && (helpingVerbs.includes(words[0]) || pronouns.includes(words[0]))) {
+    function removeQWords(text) {
+      let words = text.toLowerCase().split(/\s+/);
+      words = words.filter(word => !questionWords.includes(word));
+      while (words.length && (helpingVerbs.includes(words[0]) || pronouns.includes(words[0]))) {
         words.shift();
+      }
+      return words.join(' ');
     }
 
-    return words.join(' ');
-}
-
-function similarity(a, b) {
-    let matches = 0;
-    a = a.toLowerCase();
-    b = b.toLowerCase();
-    const len = Math.max(a.length, b.length);
-    for (let i = 0; i < len; i++) {
+    function similarity(a, b) {
+      let matches = 0;
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      const len = Math.max(a.length, b.length);
+      for (let i = 0; i < len; i++) {
         if (a[i] === b[i]) matches++;
+      }
+      return (matches / len) * 100;
     }
-    return (matches / len) * 100;
-}
 
-async function fetchJSON(path) {
-    try {
+    async function fetchJSON(path) {
+      try {
         const res = await fetch(path);
         if (res.ok) return res.json();
-    } catch (e) {}
-    return null;
-}
-
-async function searchAnswer(query) {
-    const clean = removeQWords(query);
-    const firstWord = clean.split(/\s+/).find(w => !pronouns.includes(w) && !helpingVerbs.includes(w));
-    if (!firstWord) return null;
-
-    const initial = firstWord[0];
-
-    // Search in custom folder
-    let file = await fetchJSON(`custom/${initial}.json`);
-    if (file) {
-        for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 85) return file[key];
-        }
-        for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 65) return file[key];
-        }
+      } catch (e) {}
+      return null;
     }
 
-    // Search in commen folder
-    file = await fetchJSON(`commen/${initial}.json`);
-    if (file) {
-        for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 85) return file[key];
-        }
-        for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 65) return file[key];
-        }
+    function addMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = type === 'user' ? 'user-msg' : 'bot-msg';
+      msg.textContent = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
     }
 
-    // Break into keywords and search in data
-    const keywords = clean.split(/\s+/);
-    for (let word of keywords) {
+    function addTypingIndicator() {
+      const msg = document.createElement('div');
+      msg.className = 'bot-msg';
+      msg.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
+    }
+
+    async function searchAnswer(query) {
+      const clean = removeQWords(query);
+      const firstWord = clean.split(/\s+/).find(w => !pronouns.includes(w) && !helpingVerbs.includes(w));
+      const foundAnswers = [];
+
+      if (!firstWord) return [];
+
+      const initial = firstWord[0];
+
+      let file = await fetchJSON(`custom/${initial}.json`);
+      if (file) {
+        for (let key in file) {
+          if (similarity(key.replace(/_/g, ' '), clean) > 85) foundAnswers.push(file[key]);
+        }
+        for (let key in file) {
+          if (similarity(key.replace(/_/g, ' '), clean) > 65) foundAnswers.push(file[key]);
+        }
+      }
+
+      file = await fetchJSON(`commen/${initial}.json`);
+      if (file) {
+        for (let key in file) {
+          if (similarity(key.replace(/_/g, ' '), clean) > 85) foundAnswers.push(file[key]);
+        }
+        for (let key in file) {
+          if (similarity(key.replace(/_/g, ' '), clean) > 65) foundAnswers.push(file[key]);
+        }
+      }
+
+      const keywords = clean.split(/\s+/);
+      for (let word of keywords) {
         const a = word[0];
         const b = word[1] || 'a';
         file = await fetchJSON(`data/${a}/${b}.json`);
         if (file) {
-            for (let key in file) {
-                if (similarity(key, word) > 90) return file[key];
-            }
-            for (let key in file) {
-                if (similarity(key, word) > 40) return file[key];
-            }
+          for (let key in file) {
+            if (similarity(key, word) > 90) foundAnswers.push(file[key]);
+          }
+          for (let key in file) {
+            if (similarity(key, word) > 40) foundAnswers.push(file[key]);
+          }
         }
+      }
+
+      return foundAnswers.length ? [...new Set(foundAnswers)] : [];
     }
 
-    return null;
-}
+    async function handleSend() {
+      const input = userInput.value.trim();
+      if (!input) return;
+      addMessage(input, 'user');
+      userInput.value = '';
 
-function addMessage(text, type) {
-    const msg = document.createElement('div');
-    msg.className = type === 'user' ? 'user-msg' : 'bot-msg';
-    msg.textContent = text;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+      const typingMsg = addTypingIndicator();
 
-async function handleSend() {
-    const input = userInput.value.trim();
-    if (!input) return;
-    addMessage(input, 'user');
-    userInput.value = '';
+      const replies = await searchAnswer(input);
+      typingMsg.remove();
 
-    const reply = await searchAnswer(input);
-    addMessage(reply || "Daisuke: I couldn’t find an answer. Try rephrasing.", 'bot');
-}
+      if (replies.length > 0) {
+        addMessage(replies.join('\n\n'), 'bot');
+      } else {
+        addMessage("Daisuke: Sorry, I don't know that.", 'bot');
+      }
+    }
 
-sendBtn.addEventListener('click', handleSend);
-userInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') handleSend();
-});
-</script>
-
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleSend();
+    });
+  </script>
 </body>
 </html>
