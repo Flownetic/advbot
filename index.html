@@ -191,7 +191,11 @@
         }
       }
 
-      const keywords = clean.split(/\s+/);
+      // Filter keywords before searching in data/
+      const keywords = clean.split(/\s+/).filter(word =>
+        word && !pronouns.includes(word) && !helpingVerbs.includes(word) && !questionWords.includes(word)
+      );
+
       for (let word of keywords) {
         const a = word[0];
         const b = word[1] || 'a';
