@@ -5,128 +5,298 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daisuke v1.2 - AI Chatbot</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
-      color: #e0e0e0;
+    /* Global Styles */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+    
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+    
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background-color: #000000;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid #00ff88;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00ff88;
+      text-decoration: none;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      padding: 0.5rem 0.8rem;
+      border-radius: 4px;
+    }
+    
+    .nav-links a:hover {
+      color: #00ff88;
+      background-color: rgba(0, 255, 136, 0.1);
+    }
+    
+    /* Main Container */
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    /* Chatbot Header */
+    .chat-header {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #000;
+      color: #00ff88;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid #00ff88;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    /* Chat Box */
+    .chat-box {
+      padding: 1.5rem;
+      height: 500px;
+      overflow-y: auto;
+      background-color: #1e1e1e;
+      border-left: 1px solid #333;
+      border-right: 1px solid #333;
+    }
+    
+    .user-msg, .bot-msg-group {
+      margin: 0.8rem 0;
+      max-width: 80%;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      line-height: 1.5;
+    }
+    
+    .user-msg {
+      background-color: #004d26;
+      align-self: flex-end;
+      margin-left: auto;
+      border: 1px solid #007a3d;
+    }
+    
+    .bot-msg-group {
+      background-color: #262626;
+      align-self: flex-start;
+      border-left: 3px solid #00ff88;
+    }
+    
+    .bot-msg-group p {
+      margin: 0.5rem 0;
+    }
+    
+    /* Input Area */
+    .input-area {
+      display: flex;
+      background-color: #1e1e1e;
+      padding: 1rem;
+      border-radius: 0 0 8px 8px;
+      border-left: 1px solid #333;
+      border-right: 1px solid #333;
+      border-bottom: 1px solid #333;
+    }
+    
+    #user-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background-color: #121212;
+      border: 1px solid #333;
+      color: #e0e0e0;
+      border-radius: 5px 0 0 5px;
+      font-size: 1rem;
+    }
+    
+    #user-input:focus {
+      outline: none;
+      border-color: #00ff88;
+    }
+    
+    #send-btn {
+      background-color: #00ff88;
+      border: none;
+      padding: 0 1.5rem;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      border-radius: 0 5px 5px 0;
+      transition: all 0.3s;
+    }
+    
+    #send-btn:hover {
+      background-color: #00cc6a;
+    }
+    
+    /* Loading Screen */
     .loading-screen {
       position: fixed;
       background-color: #000;
       color: #00ff88;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       font-weight: bold;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
-    .chatbot-container {
-      max-width: 800px;
-      margin: 3rem auto;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
-      display: none;
-    }
-    .chat-header {
-      text-align: center;
-      padding: 1rem;
-      background-color: #000;
-      color: #00ff88;
-      font-size: 1.5rem;
-      font-weight: bold;
-      border-bottom: 2px solid #00ff88;
-    }
-    .chat-box {
-      padding: 1rem;
-      height: 400px;
-      overflow-y: auto;
-      background-color: #121212;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .user-msg, .bot-msg-group {
-      margin: 0.5rem 0;
-      max-width: 75%;
-      border-radius: 8px;
-      padding: 0.7rem;
-    }
-    .user-msg {
-      background-color: #004d26;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-    .bot-msg-group {
-      background-color: #262626;
-      align-self: flex-start;
-    }
-    .bot-msg-group p {
-      margin: 0.3rem 0;
-    }
-    .input-container {
-      display: flex;
-    }
-    #user-input {
-      flex: 1;
-      padding: 0.7rem;
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      color: #e0e0e0;
-    }
-    #send-btn {
-      background-color: #00ff88;
-      border: none;
-      padding: 0.7rem 1.2rem;
-      cursor: pointer;
-      color: #000;
-      font-weight: bold;
-    }
-    footer {
-      text-align: center;
-      color: #888;
-      font-size: 0.9rem;
-      margin-top: 2rem;
-    }
+    
+    /* Typing Animation */
     .typing-dots span {
       display: inline-block;
       font-size: 1.5rem;
       animation: blink 1s infinite;
     }
+    
     .typing-dots span:nth-child(2) {
       animation-delay: 0.2s;
     }
+    
     .typing-dots span:nth-child(3) {
       animation-delay: 0.4s;
     }
+    
     @keyframes blink {
       0%, 100% { opacity: 0.2; }
       50% { opacity: 1; }
     }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background-color: #000000;
+      margin-top: 3rem;
+      border-top: 2px solid #00ff88;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: #00ff88;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.8rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+      }
+      
+      .chat-box {
+        height: 400px;
+        padding: 1rem;
+      }
+      
+      .user-msg, .bot-msg-group {
+        max-width: 90%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      nav {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      
+      .logo {
+        margin-bottom: 0.8rem;
+      }
+      
+      .nav-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="#" class="logo">Daisuke AI</a>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Services</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
   <div class="loading-screen" id="loading-screen">
-    <div id="loading-message">Loading Daisuke...</div>
+    <div id="loading-message">Loading Daisuke AI...</div>
   </div>
 
-  <div class="chatbot-container" id="chatbot-container">
-    <div class="chat-header">Daisuke AI Assistant</div>
+  <div class="container">
+    <div class="chat-header">Daisuke AI Assistant v1.2</div>
     <div class="chat-box" id="chat-box">
-      <div class="bot-msg-group"><p>Hi! I'm Daisuke v1.2. Ask me anything.</p></div>
+      <div class="bot-msg-group">
+        <p>Hello! I'm Daisuke, your AI assistant. How can I help you today?</p>
+      </div>
     </div>
-    <div class="input-container">
-      <input type="text" id="user-input" placeholder="Type your question...">
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
       <button id="send-btn">Send</button>
     </div>
   </div>
-  <footer>&copy; 2025 Daisuke AI. All rights reserved.</footer>
+
+  <footer>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <p>&copy; 2025 Daisuke AI. All rights reserved.</p>
+  </footer>
 
   <script>
     const chatBox = document.getElementById('chat-box');
@@ -134,7 +304,6 @@
     const sendBtn = document.getElementById('send-btn');
     const loadingScreen = document.getElementById('loading-screen');
     const loadingMessage = document.getElementById('loading-message');
-    const chatbotContainer = document.getElementById('chatbot-container');
 
     const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
     const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
@@ -276,9 +445,18 @@
       if (Array.isArray(replies) && replies.length > 0) {
         addMessage(replies, 'bot');
       } else {
-        addMessage(["Sorry, I don't know that."], 'bot');
+        addMessage(["I'm not sure I understand. Could you rephrase your question?"], 'bot');
       }
     }
+
+    // Add navigation functionality
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.textContent.toLowerCase();
+        addMessage(`You clicked on the ${page} page. How can I assist you with ${page}?`, 'bot');
+      });
+    });
 
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', e => {
@@ -288,7 +466,6 @@
     window.addEventListener('DOMContentLoaded', async () => {
       basicData = await fetchJSON('basic/basic.json');
       loadingScreen.style.display = 'none';
-      chatbotContainer.style.display = 'block';
     });
   </script>
 </body>
