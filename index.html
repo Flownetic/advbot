@@ -345,11 +345,15 @@
             return costs[s2.length];
         }
 
-        // Load JSON file
+        // Load JSON file with GitHub Pages compatible paths
         async function loadJSON(file) {
             try {
-                const response = await fetch(file);
-                if (!response.ok) return {};
+                // Prepend the repository name to the path for GitHub Pages
+                const response = await fetch(`/Flovvnetic/${file}`);
+                if (!response.ok) {
+                    console.error(`Failed to load ${file}: ${response.status}`);
+                    return {};
+                }
                 return await response.json();
             } catch (error) {
                 console.error(`Error loading ${file}:`, error);
@@ -359,6 +363,8 @@
 
         // Find best match in JSON data
         function findBestMatch(input, data, threshold) {
+            if (!data) return null;
+            
             // Exact match first
             if (data[input]) return data[input];
 
@@ -420,7 +426,7 @@
                 const firstLetter = firstWord[0];
                 const secondLetter = firstWord[1];
                 const dataFile = await loadJSON(`data/${firstLetter}/${secondLetter}.json`);
-                if (dataFile[firstWord]) return dataFile[firstWord];
+                if (dataFile && dataFile[firstWord]) return dataFile[firstWord];
             }
             
             return "Sorry, I don't have an answer for that. Please contact our team for more information.";
@@ -437,9 +443,15 @@
             showTyping();
             
             setTimeout(async () => {
-                const answer = await findAnswer(question);
-                hideTyping();
-                displayMessage(answer, false);
+                try {
+                    const answer = await findAnswer(question);
+                    hideTyping();
+                    displayMessage(answer, false);
+                } catch (error) {
+                    console.error("Error processing question:", error);
+                    hideTyping();
+                    displayMessage("An error occurred while processing your question. Please try again.", false);
+                }
             }, 1000 + Math.random() * 1000);
         });
         
