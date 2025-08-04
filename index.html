@@ -1,90 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Daisuke v1.2 Chatbot</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daisuke v1.2 - AI Chatbot</title>
   <style>
-    body { background: #111; color: #eee; font-family: sans-serif; padding: 20px; }
-    #chat { max-width: 600px; margin: auto; background: #222; padding: 20px; border-radius: 10px; }
-    .message { margin-bottom: 10px; }
-    .user { color: #0f0; }
-    .bot { color: #00ffff; }
-    input, button {
-      padding: 10px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 5%;
+      background-color: #000000;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid #00ff88;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #00ff88;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #00ff88;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .chatbot-container {
+      max-width: 800px;
+      margin: 3rem auto;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 255, 136, 0.1);
+      border: 1px solid #333333;
+    }
+
+    .chatbot-header {
+      background-color: #000000;
+      padding: 1.5rem;
+      border-bottom: 2px solid #00ff88;
+      text-align: center;
+    }
+
+    .chatbot-header h2 {
+      color: #00ff88;
+      margin-bottom: 0.5rem;
+    }
+
+    .chatbot-header p {
+      color: #b0b0b0;
+    }
+
+    .chat-messages {
+      height: 500px;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background-color: #121212;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      max-width: 80%;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .user-message {
+      background-color: #003d1f;
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+      border: 1px solid #00a55a;
+    }
+
+    .bot-message {
+      background-color: #1a1a1a;
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+      border: 1px solid #333333;
+    }
+
+    .chat-input-container {
+      display: flex;
+      padding: 1rem;
+      background-color: #000000;
+      border-top: 1px solid #333333;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background-color: #1e1e1e;
+      border: 1px solid #333333;
+      border-radius: 4px;
+      color: #e0e0e0;
       font-size: 1rem;
-      margin-top: 10px;
+    }
+
+    #user-input:focus {
+      outline: none;
+      border-color: #00ff88;
+    }
+
+    #send-button {
+      margin-left: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      background-color: #00ff88;
+      color: #121212;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    #send-button:hover {
+      background-color: #00cc6a;
+      transform: translateY(-2px);
+    }
+
+    .suggested-questions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0 1.5rem 1rem;
+      background-color: #121212;
+    }
+
+    .suggested-question {
+      padding: 0.5rem 1rem;
+      background-color: #1a1a1a;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      border: 1px solid #333333;
+    }
+
+    .suggested-question:hover {
+      background-color: #00ff88;
+      color: #121212;
+      border-color: #00ff88;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background-color: #000000;
+      margin-top: 3rem;
+      border-top: 2px solid #00ff88;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00ff88;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .chat-messages {
+        height: 400px;
+        padding: 1rem;
+      }
+      .message {
+        max-width: 90%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="chat">
-    <h2>Daisuke v1.2 🤖</h2>
-    <div id="chat-window"></div>
-    <input type="text" id="userInput" placeholder="Ask something..." />
-    <button onclick="handleInput()">Send</button>
+  <nav>
+    <a href="#" class="logo">Daisuke v1.2</a>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Docs</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="chatbot-container">
+      <div class="chatbot-header">
+        <h2>Daisuke AI Assistant</h2>
+        <p>Ask anything — I search and understand intelligently!</p>
+      </div>
+
+      <div class="suggested-questions">
+        <div class="suggested-question">What is your pricing?</div>
+        <div class="suggested-question">How do you integrate APIs?</div>
+        <div class="suggested-question">What technologies do you use?</div>
+        <div class="suggested-question">Explain your development process</div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="message bot-message">
+          Hi! I'm Daisuke v1.2. I use multi-level matching from custom, commen, and data sources.<br>
+          Try asking about services, integration, or anything technical!
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <input type="text" id="user-input" placeholder="Type your question..." autofocus />
+        <button id="send-button">Send</button>
+      </div>
+    </div>
   </div>
+
+  <footer>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Blog</a>
+    </div>
+    <p>&copy; 2025 Daisuke AI. All rights reserved.</p>
+  </footer>
 
   <script>
     const questionWords = ["what", "who", "how", "why", "where", "when", "which", "whom", "whose"];
-    const shownResponses = new Set(); // To handle duplicates
+    const shownResponses = new Set();
 
-    async function handleInput() {
-      const input = document.getElementById('userInput').value.trim();
-      if (!input) return;
-      appendMessage("You: " + input, "user");
-
-      const clean = removeQuestionWords(input);
-      const words = clean.split(/\s+/);
-      const firstWord = words[0]?.toLowerCase();
-      if (!firstWord) return appendMessage("Daisuke: ❓ Please ask a more detailed question.", "bot");
-
-      const firstLetter = firstWord[0];
-
-      // Reset shown response set for this query
-      shownResponses.clear();
-
-      // Step 1: Check in custom/
-      let response = await searchJSON(`custom/${firstLetter}.json`, clean, [0.85, 0.65], true);
-      if (response) return appendMessage("Daisuke: " + response, "bot");
-
-      // Step 2: Check in commen/
-      response = await searchJSON(`commen/${firstLetter}/${firstLetter}.json`, clean, [0.85, 0.65], true);
-      if (response) return appendMessage("Daisuke: " + response, "bot");
-
-      // Step 3: Keyword-based search in data/
-      const keywords = clean.split(/\s+/);
-      const matches = [];
-      for (let keyword of keywords) {
-        const k1 = keyword[0]?.toLowerCase();
-        const k2 = keyword[1]?.toLowerCase();
-        if (!k1 || !k2) continue;
-        const path = `data/${k1}/${k2}.json`;
-        const match = await searchJSON(path, keyword, [0.9, 0.4], false);
-        if (match && !shownResponses.has(match)) {
-          shownResponses.add(match);
-          matches.push(`🔹 ${match}`);
-        }
-      }
-
-      if (matches.length > 0) {
-        appendMessage("Daisuke:\n" + matches.join("\n"), "bot");
-      } else {
-        appendMessage("Daisuke: 🤔 I couldn't find a good match. Please try rephrasing.", "bot");
-      }
-    }
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    const suggestedQuestions = document.querySelectorAll('.suggested-question');
 
     function removeQuestionWords(sentence) {
-      const tokens = sentence.toLowerCase().split(/\s+/);
-      return tokens.filter(word => !questionWords.includes(word)).join(" ");
+      return sentence.toLowerCase().split(/\s+/)
+        .filter(word => !questionWords.includes(word)).join(" ");
     }
 
-    function appendMessage(text, className) {
-      const chat = document.getElementById('chat-window');
-      const div = document.createElement('div');
-      div.className = 'message ' + className;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', `${sender}-message`);
+      messageDiv.innerHTML = text;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     async function searchJSON(url, input, thresholds = [0.85, 0.65], treatUnderscoreAsSpace = true) {
@@ -94,8 +291,8 @@
         const data = await res.json();
         for (const threshold of thresholds) {
           for (const key in data) {
-            let keyProcessed = treatUnderscoreAsSpace ? key.replace(/_/g, " ") : key;
-            if (similarity(input.toLowerCase(), keyProcessed.toLowerCase()) >= threshold) {
+            const keyProcessed = treatUnderscoreAsSpace ? key.replace(/_/g, " ") : key;
+            if (similarity(input, keyProcessed.toLowerCase()) >= threshold) {
               const answer = data[key];
               if (!shownResponses.has(answer)) {
                 shownResponses.add(answer);
@@ -104,29 +301,29 @@
             }
           }
         }
-      } catch (err) {
-        return null;
-      }
+      } catch (e) { return null; }
       return null;
     }
 
     function similarity(s1, s2) {
-      let longer = s1.length > s2.length ? s1 : s2;
-      let shorter = s1.length > s2.length ? s2 : s1;
-      let longerLength = longer.length;
+      const longer = s1.length > s2.length ? s1 : s2;
+      const shorter = s1.length > s2.length ? s2 : s1;
+      const longerLength = longer.length;
       if (longerLength === 0) return 1.0;
       return (longerLength - editDistance(longer, shorter)) / longerLength;
     }
 
     function editDistance(s1, s2) {
-      const costs = Array(s2.length + 1).fill().map(() => 0);
+      const costs = Array(s2.length + 1).fill(0);
       for (let i = 0; i <= s1.length; i++) {
         let lastValue = i;
         for (let j = 0; j <= s2.length; j++) {
           if (i === 0) costs[j] = j;
           else if (j > 0) {
             let newValue = costs[j - 1];
-            if (s1[i - 1] !== s2[j - 1]) newValue = Math.min(newValue, lastValue, costs[j]) + 1;
+            if (s1[i - 1] !== s2[j - 1]) {
+              newValue = Math.min(newValue, lastValue, costs[j]) + 1;
+            }
             costs[j - 1] = lastValue;
             lastValue = newValue;
           }
@@ -135,6 +332,69 @@
       }
       return costs[s2.length];
     }
+
+    async function getBotResponse(inputText) {
+      const cleaned = removeQuestionWords(inputText);
+      const words = cleaned.split(/\s+/).filter(Boolean);
+      if (words.length === 0) return null;
+      const firstLetter = words[0][0]?.toLowerCase();
+      if (!firstLetter) return null;
+
+      shownResponses.clear();
+
+      // Step 1: custom
+      let response = await searchJSON(`custom/${firstLetter}.json`, cleaned, [0.85, 0.65], true);
+      if (response) return response;
+
+      // Step 2: commen
+      response = await searchJSON(`commen/${firstLetter}/${firstLetter}.json`, cleaned, [0.85, 0.65], true);
+      if (response) return response;
+
+      // Step 3: data keyword lookup
+      const matches = [];
+      for (let word of words) {
+        const a = word[0]?.toLowerCase(), b = word[1]?.toLowerCase();
+        if (!a || !b) continue;
+        const path = `data/${a}/${b}.json`;
+        const match = await searchJSON(path, word, [0.9, 0.4], false);
+        if (match && !shownResponses.has(match)) {
+          shownResponses.add(match);
+          matches.push(`🔹 ${match}`);
+        }
+      }
+
+      return matches.length > 0
+        ? matches.join("<br>")
+        : "Sorry, I couldn’t find any relevant answers. Please rephrase!";
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addMessage(message, 'user');
+      userInput.value = '';
+
+      const typing = document.createElement('div');
+      typing.className = 'message bot-message';
+      typing.textContent = '...';
+      chatMessages.appendChild(typing);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      setTimeout(async () => {
+        chatMessages.removeChild(typing);
+        const response = await getBotResponse(message);
+        addMessage("Daisuke: " + response, 'bot');
+      }, 700);
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    suggestedQuestions.forEach(q => q.addEventListener('click', () => {
+      userInput.value = q.textContent;
+      sendMessage();
+    }));
+    window.addEventListener('load', () => userInput.focus());
   </script>
 </body>
 </html>
