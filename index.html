@@ -183,6 +183,9 @@
         const sendButton = document.getElementById('send-button');
         const typingIndicator = document.getElementById('typing-indicator');
 
+        // Question words to ignore
+        const QUESTION_WORDS = ['what', 'how', 'who', 'where', 'when', 'why', 'is', 'are', 'do', 'does', 'tell', 'explain', 'define'];
+
         // Display a message in chat
         function displayMessage(text, isUser) {
             const div = document.createElement('div');
@@ -202,8 +205,126 @@
             typingIndicator.style.display = 'none';
         }
 
-        // Event listeners - Fixed version
-        function handleSend() {
+        // Calculate similarity between strings
+        function similarity(s1, s2) {
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length <= s2.length ? s1 : s2;
+            if (longer.length === 0) return 1.0;
+            return (longer.length - editDistance(longer, shorter)) / longer.length;
+        }
+
+        // Edit distance helper
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            const costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1[i - 1] !== s2[j - 1]) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        // Load JSON file
+        async function loadJSON(file) {
+            try {
+                const response = await fetch(file);
+                if (!response.ok) {
+                    console.error(`File not found: ${file}`);
+                    return {};
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(`Error loading ${file}:`, error);
+                return {};
+            }
+        }
+
+        // Find best match in JSON data
+        function findBestMatch(input, data, threshold) {
+            if (!data) return null;
+            
+            // Exact match first
+            if (data[input]) return data[input];
+
+            // Similarity match
+            if (threshold > 0) {
+                let bestMatch = null;
+                let bestScore = 0;
+
+                for (const key in data) {
+                    const score = similarity(input, key);
+                    if (score > bestScore && score >= threshold) {
+                        bestScore = score;
+                        bestMatch = data[key];
+                    }
+                }
+                return bestMatch;
+            }
+
+            return null;
+        }
+
+        // Extract first keyword (ignore question words)
+        function getFirstKeyword(input) {
+            const words = input.split(' ').filter(word => 
+                !QUESTION_WORDS.includes(word.replace(/[^a-z]/g, ''))
+            ).map(word => word.replace(/[^a-z]/g, ''));
+            return words[0] || null;
+        }
+
+        // Process input through the 4 steps
+        async function findAnswer(input) {
+            input = input.toLowerCase().trim();
+            
+            // Step 1: Check basic.json (80% threshold)
+            const basicData = await loadJSON('basic.json');
+            const step1Answer = findBestMatch(input, basicData, 0.8);
+            if (step1Answer) return step1Answer;
+            
+            // Step 2: Check custom/[letter].json (85% → 60%)
+            const firstWord = getFirstKeyword(input);
+            if (firstWord) {
+                const firstLetter = firstWord[0];
+                const customData = await loadJSON(`custom/${firstLetter}.json`);
+                const customMatch = findBestMatch(firstWord, customData, 0.85) || 
+                                    findBestMatch(firstWord, customData, 0.6);
+                if (customMatch) return customMatch;
+            }
+            
+            // Step 3: Check commen/[letter].json (same thresholds)
+            if (firstWord) {
+                const commenData = await loadJSON(`commen/${firstWord[0]}.json`);
+                const commenMatch = findBestMatch(firstWord, commenData, 0.85) || 
+                                   findBestMatch(firstWord, commenData, 0.6);
+                if (commenMatch) return commenMatch;
+            }
+            
+            // Step 4: Check data/[first]/[second].json (exact match)
+            if (firstWord && firstWord.length >= 2) {
+                const firstLetter = firstWord[0];
+                const secondLetter = firstWord[1];
+                const dataFile = await loadJSON(`data/${firstLetter}/${secondLetter}.json`);
+                if (dataFile && dataFile[firstWord]) return dataFile[firstWord];
+            }
+            
+            return "Sorry, I don't have an answer for that. Please contact our team for more information.";
+        }
+
+        // Handle sending messages
+        async function handleSend() {
             const question = userInput.value.trim();
             if (!question) return;
             
@@ -214,19 +335,15 @@
             // Show typing indicator
             showTyping();
             
-            // Simulate bot response after delay
-            setTimeout(() => {
+            try {
+                const answer = await findAnswer(question);
                 hideTyping();
-                const responses = [
-                    "Thanks for your question! This is a basic response.",
-                    "I'm still learning, but I'll try to help!",
-                    "That's an interesting question about our services.",
-                    "Our AI technology can help with various business needs.",
-                    "Please contact our team for more detailed information."
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                displayMessage(randomResponse, false);
-            }, 1500);
+                displayMessage(answer, false);
+            } catch (error) {
+                console.error("Error processing question:", error);
+                hideTyping();
+                displayMessage("An error occurred while processing your question. Please try again.", false);
+            }
         }
 
         // Attach event listeners
