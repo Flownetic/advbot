@@ -116,13 +116,22 @@
     const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
     const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
+    function cleanText(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s_]/g, '') // Remove all symbols except underscore
+        .split(/\s+/)
+        .filter(Boolean);
+    }
+
     function removeQWords(text) {
-      let words = text.toLowerCase().split(/\s+/);
-      words = words.filter(word => !questionWords.includes(word));
-      while (words.length && (helpingVerbs.includes(words[0]) || pronouns.includes(words[0]))) {
-        words.shift();
-      }
-      return words.join(' ');
+      const words = cleanText(text);
+      return words
+        .filter(word =>
+          !questionWords.includes(word) &&
+          !pronouns.includes(word) &&
+          !helpingVerbs.includes(word)
+        ).join(' ');
     }
 
     function similarity(a, b) {
@@ -164,20 +173,17 @@
 
     async function searchAnswer(query) {
       const clean = removeQWords(query);
-      const wordsArray = clean.split(/\s+/).filter(w => w);
-      
-      const meaningfulWords = wordsArray.filter(word =>
-        !pronouns.includes(word) && !helpingVerbs.includes(word) && !questionWords.includes(word)
-      );
-      if (meaningfulWords.length === 0) {
+      const wordsArray = cleanText(query);
+      const keywords = wordsArray.filter(w => !pronouns.includes(w) && !helpingVerbs.includes(w) && !questionWords.includes(w));
+
+      if (keywords.length === 0) {
         return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
       }
 
       const foundAnswers = [];
 
-      // Search in custom folder
-      const firstWord = meaningfulWords[0];
-      let file = await fetchJSON(`custom/${firstWord[0]}.json`);
+      // --- Search in custom folder
+      let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
           if (similarity(key.replace(/_/g, ' '), clean) > 85) {
@@ -195,9 +201,9 @@
         }
       }
 
-      // Search in commen folder
+      // --- Search in commen folder
       if (foundAnswers.length === 0) {
-        file = await fetchJSON(`commen/${firstWord[0]}.json`);
+        file = await fetchJSON(`commen/${keywords[0][0]}.json`);
         if (file) {
           for (let key in file) {
             if (similarity(key.replace(/_/g, ' '), clean) > 85) {
@@ -216,10 +222,12 @@
         }
       }
 
-      // Search in data folder
+      // --- Search in data/ folder
       if (foundAnswers.length === 0) {
-        for (let word of meaningfulWords) {
-          file = await fetchJSON(`data/${word[0]}/${word[1] || 'a'}.json`);
+        for (let word of keywords) {
+          const a = word[0];
+          const b = word[1] || 'a';
+          file = await fetchJSON(`data/${a}/${b}.json`);
           if (file) {
             let matched = false;
             for (let key in file) {
