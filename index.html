@@ -118,7 +118,7 @@
 
     let basicData = {};
 
-    // Load basic.json on page load
+    // Load basic/basic.json
     (async () => {
       const res = await fetch('basic/basic.json');
       if (res.ok) {
@@ -129,19 +129,18 @@
     function cleanText(text) {
       return text
         .toLowerCase()
-        .replace(/[^\w\s_]/g, '') // Remove all symbols except underscore
+        .replace(/[^\w\s_]/g, '')
         .split(/\s+/)
         .filter(Boolean);
     }
 
     function removeQWords(text) {
       const words = cleanText(text);
-      return words
-        .filter(word =>
-          !questionWords.includes(word) &&
-          !pronouns.includes(word) &&
-          !helpingVerbs.includes(word)
-        ).join(' ');
+      return words.filter(word =>
+        !questionWords.includes(word) &&
+        !pronouns.includes(word) &&
+        !helpingVerbs.includes(word)
+      ).join(' ');
     }
 
     function similarity(a, b) {
@@ -182,9 +181,9 @@
     }
 
     async function searchAnswer(query) {
-      // STEP 1: Check in basic/basic.json
+      // Step 1: Match original query (no cleaning) in basic.json
       for (let key in basicData) {
-        if (key.toLowerCase().trim() === query.toLowerCase().trim()) {
+        if (key.trim() === query.trim()) {
           return [basicData[key]];
         }
       }
@@ -194,10 +193,14 @@
         }
       }
 
-      // STEP 2: Continue to layered search
+      // Step 2: Continue to layered matching
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
-      const keywords = wordsArray.filter(w => !pronouns.includes(w) && !helpingVerbs.includes(w) && !questionWords.includes(w));
+      const keywords = wordsArray.filter(w =>
+        !pronouns.includes(w) &&
+        !helpingVerbs.includes(w) &&
+        !questionWords.includes(w)
+      );
 
       if (keywords.length === 0) {
         return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
@@ -205,7 +208,6 @@
 
       const foundAnswers = [];
 
-      // Search in custom/
       let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
@@ -224,7 +226,6 @@
         }
       }
 
-      // Search in commen/
       if (foundAnswers.length === 0) {
         file = await fetchJSON(`commen/${keywords[0][0]}.json`);
         if (file) {
@@ -245,7 +246,6 @@
         }
       }
 
-      // Search in data/
       if (foundAnswers.length === 0) {
         for (let word of keywords) {
           const a = word[0];
@@ -287,8 +287,8 @@
       const replies = await searchAnswer(input);
       typingMsg.remove();
 
-      if (replies.length > 0) {
-        addMessage(replies.join('\n\n'), 'bot');
+      if (Array.isArray(replies) && replies.length > 0) {
+        replies.forEach(reply => addMessage(reply, 'bot'));
       } else {
         addMessage("Daisuke: Sorry, I don't know that.", 'bot');
       }
