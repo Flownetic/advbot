@@ -107,108 +107,132 @@
   </div>
   <footer>&copy; 2025 Daisuke AI. All rights reserved.</footer>
 
-  <script>
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
 
-    const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
-    const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
-    const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
+  const questionWords = ['what', 'how', 'who', 'why', 'when', 'where', 'which', 'whom', 'whose'];
+  const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
+  const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
-    let basicData = {};
+  let basicData = {};
+  let isReady = false;
 
-    // Load basic/basic.json
-    (async () => {
+  // Load basic.json before allowing interaction
+  async function loadBasic() {
+    try {
       const res = await fetch('basic/basic.json');
       if (res.ok) {
         basicData = await res.json();
+        isReady = true;
+        console.log('Basic data loaded.');
+      } else {
+        console.warn('Failed to load basic.json');
       }
-    })();
-
-    function cleanText(text) {
-      return text
-        .toLowerCase()
-        .replace(/[^\w\s_]/g, '')
-        .split(/\s+/)
-        .filter(Boolean);
+    } catch (e) {
+      console.error('Error loading basic.json:', e);
     }
+  }
 
-    function removeQWords(text) {
-      const words = cleanText(text);
-      return words.filter(word =>
-        !questionWords.includes(word) &&
-        !pronouns.includes(word) &&
-        !helpingVerbs.includes(word)
-      ).join(' ');
+  loadBasic();
+
+  function cleanText(text) {
+    return text.toLowerCase().replace(/[^\w\s_]/g, '').split(/\s+/).filter(Boolean);
+  }
+
+  function removeQWords(text) {
+    const words = cleanText(text);
+    return words.filter(word =>
+      !questionWords.includes(word) &&
+      !pronouns.includes(word) &&
+      !helpingVerbs.includes(word)
+    ).join(' ');
+  }
+
+  function similarity(a, b) {
+    let matches = 0;
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+      if (a[i] === b[i]) matches++;
     }
+    return (matches / len) * 100;
+  }
 
-    function similarity(a, b) {
-      let matches = 0;
-      a = a.toLowerCase();
-      b = b.toLowerCase();
-      const len = Math.max(a.length, b.length);
-      for (let i = 0; i < len; i++) {
-        if (a[i] === b[i]) matches++;
+  async function fetchJSON(path) {
+    try {
+      const res = await fetch(path);
+      if (res.ok) return res.json();
+    } catch (e) {}
+    return null;
+  }
+
+  function addMessage(text, type) {
+    const msg = document.createElement('div');
+    msg.className = type === 'user' ? 'user-msg' : 'bot-msg';
+    msg.textContent = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return msg;
+  }
+
+  function addTypingIndicator() {
+    const msg = document.createElement('div');
+    msg.className = 'bot-msg';
+    msg.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return msg;
+  }
+
+  async function searchAnswer(query) {
+    // Step 1: Check raw input in basic.json (exact)
+    if (basicData[query]) return [basicData[query]];
+
+    // Step 2: Fuzzy match
+    for (let key in basicData) {
+      if (similarity(key, query) > 90) {
+        return [basicData[key]];
       }
-      return (matches / len) * 100;
     }
 
-    async function fetchJSON(path) {
-      try {
-        const res = await fetch(path);
-        if (res.ok) return res.json();
-      } catch (e) {}
-      return null;
+    // Step 3: Custom/commen/data layered fallback
+    const clean = removeQWords(query);
+    const wordsArray = cleanText(query);
+    const keywords = wordsArray.filter(w =>
+      !pronouns.includes(w) &&
+      !helpingVerbs.includes(w) &&
+      !questionWords.includes(w)
+    );
+
+    if (keywords.length === 0) {
+      return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
     }
 
-    function addMessage(text, type) {
-      const msg = document.createElement('div');
-      msg.className = type === 'user' ? 'user-msg' : 'bot-msg';
-      msg.textContent = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return msg;
-    }
+    const foundAnswers = [];
 
-    function addTypingIndicator() {
-      const msg = document.createElement('div');
-      msg.className = 'bot-msg';
-      msg.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return msg;
-    }
-
-    async function searchAnswer(query) {
-      // Step 1: Match original query (no cleaning) in basic.json
-      for (let key in basicData) {
-        if (key.trim() === query.trim()) {
-          return [basicData[key]];
+    let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
+    if (file) {
+      for (let key in file) {
+        if (similarity(key.replace(/_/g, ' '), clean) > 85) {
+          foundAnswers.push(file[key]);
+          break;
         }
       }
-      for (let key in basicData) {
-        if (similarity(key, query) > 90) {
-          return [basicData[key]];
+      if (foundAnswers.length === 0) {
+        for (let key in file) {
+          if (similarity(key.replace(/_/g, ' '), clean) > 65) {
+            foundAnswers.push(file[key]);
+            break;
+          }
         }
       }
+    }
 
-      // Step 2: Continue to layered matching
-      const clean = removeQWords(query);
-      const wordsArray = cleanText(query);
-      const keywords = wordsArray.filter(w =>
-        !pronouns.includes(w) &&
-        !helpingVerbs.includes(w) &&
-        !questionWords.includes(w)
-      );
-
-      if (keywords.length === 0) {
-        return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
-      }
-
-      const foundAnswers = [];
-
-      let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
+    if (foundAnswers.length === 0) {
+      file = await fetchJSON(`commen/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
           if (similarity(key.replace(/_/g, ' '), clean) > 85) {
@@ -225,19 +249,26 @@
           }
         }
       }
+    }
 
-      if (foundAnswers.length === 0) {
-        file = await fetchJSON(`commen/${keywords[0][0]}.json`);
+    if (foundAnswers.length === 0) {
+      for (let word of keywords) {
+        const a = word[0];
+        const b = word[1] || 'a';
+        file = await fetchJSON(`data/${a}/${b}.json`);
         if (file) {
+          let matched = false;
           for (let key in file) {
-            if (similarity(key.replace(/_/g, ' '), clean) > 85) {
+            if (similarity(key, word) > 90) {
               foundAnswers.push(file[key]);
+              matched = true;
               break;
             }
           }
-          if (foundAnswers.length === 0) {
+          if (!matched) {
             for (let key in file) {
-              if (similarity(key.replace(/_/g, ' '), clean) > 65) {
+              const sim = similarity(key, word);
+              if (sim > 40 && sim < 80 && key.includes('_')) {
                 foundAnswers.push(file[key]);
                 break;
               }
@@ -245,59 +276,34 @@
           }
         }
       }
-
-      if (foundAnswers.length === 0) {
-        for (let word of keywords) {
-          const a = word[0];
-          const b = word[1] || 'a';
-          file = await fetchJSON(`data/${a}/${b}.json`);
-          if (file) {
-            let matched = false;
-            for (let key in file) {
-              if (similarity(key, word) > 90) {
-                foundAnswers.push(file[key]);
-                matched = true;
-                break;
-              }
-            }
-            if (!matched) {
-              for (let key in file) {
-                const sim = similarity(key, word);
-                if (sim > 40 && sim < 80 && key.includes('_')) {
-                  foundAnswers.push(file[key]);
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      return foundAnswers.length ? [...new Set(foundAnswers)] : [];
     }
 
-    async function handleSend() {
-      const input = userInput.value.trim();
-      if (!input) return;
-      addMessage(input, 'user');
-      userInput.value = '';
+    return foundAnswers.length ? [...new Set(foundAnswers)] : [];
+  }
 
-      const typingMsg = addTypingIndicator();
+  async function handleSend() {
+    const input = userInput.value.trim();
+    if (!input || !isReady) return;
 
-      const replies = await searchAnswer(input);
-      typingMsg.remove();
+    addMessage(input, 'user');
+    userInput.value = '';
 
-      if (Array.isArray(replies) && replies.length > 0) {
-        replies.forEach(reply => addMessage(reply, 'bot'));
-      } else {
-        addMessage("Daisuke: Sorry, I don't know that.", 'bot');
-      }
+    const typingMsg = addTypingIndicator();
+
+    const replies = await searchAnswer(input);
+    typingMsg.remove();
+
+    if (Array.isArray(replies) && replies.length > 0) {
+      replies.forEach(reply => addMessage(reply, 'bot'));
+    } else {
+      addMessage("Daisuke: Sorry, I don't know that.", 'bot');
     }
+  }
 
-    sendBtn.addEventListener('click', handleSend);
-    userInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') handleSend();
-    });
-  </script>
+  sendBtn.addEventListener('click', handleSend);
+  userInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') handleSend();
+  });
+          </script>
 </body>
 </html>
