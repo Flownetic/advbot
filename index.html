@@ -116,17 +116,6 @@
     const helpingVerbs = ['is', 'am', 'are', 'was', 'were', 'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'shall', 'should', 'can', 'could', 'may', 'might', 'must'];
     const pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their'];
 
-    let basicData = {};
-
-    // Load basic/basic.json
-    (async () => {
-      const res = await fetch('basic/basic.json');
-      if (res.ok) return res.json(); {
-        catch (e) {}
-      return null;
-      }
-    })();
-
     function cleanText(text) {
       return text
         .toLowerCase()
@@ -182,19 +171,19 @@
     }
 
     async function searchAnswer(query) {
-      // Step 1: Match original query (no cleaning) in basic.json
-      for (let key in basicData) {
-        if (key.trim() === query.trim()) {
-          return [basicData[key]];
-        }
-      }
-      for (let key in basicData) {
-        if (similarity(key, query) > 90) {
-          return [basicData[key]];
+      // Step 1: Search in basic/basic.json (original input only)
+      let file = await fetchJSON('basic/basic.json');
+      if (file) {
+        if (file[query]) return [file[query]];
+
+        for (let key in file) {
+          if (similarity(key, query) > 90) {
+            return [file[key]];
+          }
         }
       }
 
-      // Step 2: Continue to layered matching
+      // Step 2: Search using cleaned keywords
       const clean = removeQWords(query);
       const wordsArray = cleanText(query);
       const keywords = wordsArray.filter(w =>
@@ -209,7 +198,7 @@
 
       const foundAnswers = [];
 
-      let file = await fetchJSON(`custom/${keywords[0][0]}.json`);
+      file = await fetchJSON(`custom/${keywords[0][0]}.json`);
       if (file) {
         for (let key in file) {
           if (similarity(key.replace(/_/g, ' '), clean) > 85) {
@@ -280,6 +269,7 @@
     async function handleSend() {
       const input = userInput.value.trim();
       if (!input) return;
+
       addMessage(input, 'user');
       userInput.value = '';
 
