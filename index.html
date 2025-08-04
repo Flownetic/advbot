@@ -164,48 +164,80 @@
 
     async function searchAnswer(query) {
       const clean = removeQWords(query);
-      const firstWord = clean.split(/\s+/).find(w => !pronouns.includes(w) && !helpingVerbs.includes(w));
+      const wordsArray = clean.split(/\s+/).filter(w => w);
+      
+      const meaningfulWords = wordsArray.filter(word =>
+        !pronouns.includes(word) && !helpingVerbs.includes(word) && !questionWords.includes(word)
+      );
+      if (meaningfulWords.length === 0) {
+        return ["Daisuke: Your question does not make any sense. Please ask something meaningful."];
+      }
+
       const foundAnswers = [];
 
-      if (!firstWord) return [];
-
-      const initial = firstWord[0];
-
-      let file = await fetchJSON(`custom/${initial}.json`);
+      // Search in custom folder
+      const firstWord = meaningfulWords[0];
+      let file = await fetchJSON(`custom/${firstWord[0]}.json`);
       if (file) {
         for (let key in file) {
-          if (similarity(key.replace(/_/g, ' '), clean) > 85) foundAnswers.push(file[key]);
+          if (similarity(key.replace(/_/g, ' '), clean) > 85) {
+            foundAnswers.push(file[key]);
+            break;
+          }
         }
-        for (let key in file) {
-          if (similarity(key.replace(/_/g, ' '), clean) > 65) foundAnswers.push(file[key]);
+        if (foundAnswers.length === 0) {
+          for (let key in file) {
+            if (similarity(key.replace(/_/g, ' '), clean) > 65) {
+              foundAnswers.push(file[key]);
+              break;
+            }
+          }
         }
       }
 
-      file = await fetchJSON(`commen/${initial}.json`);
-      if (file) {
-        for (let key in file) {
-          if (similarity(key.replace(/_/g, ' '), clean) > 85) foundAnswers.push(file[key]);
-        }
-        for (let key in file) {
-          if (similarity(key.replace(/_/g, ' '), clean) > 65) foundAnswers.push(file[key]);
-        }
-      }
-
-      // Filter keywords before searching in data/
-      const keywords = clean.split(/\s+/).filter(word =>
-        word && !pronouns.includes(word) && !helpingVerbs.includes(word) && !questionWords.includes(word)
-      );
-
-      for (let word of keywords) {
-        const a = word[0];
-        const b = word[1] || 'a';
-        file = await fetchJSON(`data/${a}/${b}.json`);
+      // Search in commen folder
+      if (foundAnswers.length === 0) {
+        file = await fetchJSON(`commen/${firstWord[0]}.json`);
         if (file) {
           for (let key in file) {
-            if (similarity(key, word) > 90) foundAnswers.push(file[key]);
+            if (similarity(key.replace(/_/g, ' '), clean) > 85) {
+              foundAnswers.push(file[key]);
+              break;
+            }
           }
-          for (let key in file) {
-            if (similarity(key, word) > 40) foundAnswers.push(file[key]);
+          if (foundAnswers.length === 0) {
+            for (let key in file) {
+              if (similarity(key.replace(/_/g, ' '), clean) > 65) {
+                foundAnswers.push(file[key]);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Search in data folder
+      if (foundAnswers.length === 0) {
+        for (let word of meaningfulWords) {
+          file = await fetchJSON(`data/${word[0]}/${word[1] || 'a'}.json`);
+          if (file) {
+            let matched = false;
+            for (let key in file) {
+              if (similarity(key, word) > 90) {
+                foundAnswers.push(file[key]);
+                matched = true;
+                break;
+              }
+            }
+            if (!matched) {
+              for (let key in file) {
+                const sim = similarity(key, word);
+                if (sim > 40 && sim < 80 && key.includes('_')) {
+                  foundAnswers.push(file[key]);
+                  break;
+                }
+              }
+            }
           }
         }
       }
