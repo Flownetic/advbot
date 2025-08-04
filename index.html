@@ -108,6 +108,10 @@
   <footer>&copy; 2025 Daisuke AI. All rights reserved.</footer>
 
 <script>
+  if (!isReady) {
+  addMessage("Please wait, Daisuke is still loading knowledge...", 'bot');
+  return;
+  }
   const chatBox = document.getElementById('chat-box');
   const userInput = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
