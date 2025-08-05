@@ -450,14 +450,6 @@
       }
     }
 
-    // Add navigation functionality
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const page = this.textContent.toLowerCase();
-        addMessage(`You clicked on the ${page} page. How can I assist you with ${page}?`, 'bot');
-      });
-    });
 
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', e => {
